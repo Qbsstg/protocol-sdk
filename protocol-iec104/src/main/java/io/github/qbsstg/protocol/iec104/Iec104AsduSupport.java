@@ -48,6 +48,8 @@ public final class Iec104AsduSupport {
             case M_IT_NA_1:
             case M_IT_TB_1:
                 return typed(asduType, Iec104IntegratedTotalsValue.class);
+            case M_PS_NA_1:
+                return typed(asduType, Iec104PackedSinglePointValue.class);
             case C_SC_NA_1:
             case C_SC_TA_1:
                 return typed(asduType, Iec104SingleCommandValue.class);

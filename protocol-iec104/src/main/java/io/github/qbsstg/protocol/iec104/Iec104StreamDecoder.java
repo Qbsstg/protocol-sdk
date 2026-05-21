@@ -214,6 +214,8 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
                 return parseIntegratedTotalsValue(asduType, elementBytes, false);
             case M_IT_TB_1:
                 return parseIntegratedTotalsValue(asduType, elementBytes, true);
+            case M_PS_NA_1:
+                return parsePackedSinglePointValue(asduType, elementBytes);
             case C_SC_NA_1:
                 return parseSingleCommandValue(asduType, elementBytes, false);
             case C_SC_TA_1:
@@ -350,6 +352,16 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
         return new Iec104IntegratedTotalsValue(asduType, readSignedLittleEndian32(elementBytes, 0),
                 rawQualifier & 0x1F, (rawQualifier & 0x20) != 0, (rawQualifier & 0x40) != 0,
                 (rawQualifier & 0x80) != 0, parseTimeTag(elementBytes, timeTagged, 5));
+    }
+
+    private Iec104PackedSinglePointValue parsePackedSinglePointValue(Iec104AsduType asduType,
+                                                                     byte[] elementBytes) {
+        if (elementBytes.length < 5) {
+            return null;
+        }
+        return new Iec104PackedSinglePointValue(asduType, readUnsignedLittleEndian(elementBytes, 0, 2),
+                readUnsignedLittleEndian(elementBytes, 2, 2),
+                Iec104QualityDescriptor.status(ByteArrayUtil.unsignedByte(elementBytes[4])));
     }
 
     private Iec104SingleCommandValue parseSingleCommandValue(Iec104AsduType asduType, byte[] elementBytes,
