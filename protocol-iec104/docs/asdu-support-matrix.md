@@ -34,6 +34,7 @@ if (support.hasTypedValue()) {
 | 11 | `M_ME_NB_1` | `Iec104MeasuredValue` | Scaled measured value and QDS quality flags |
 | 13 | `M_ME_NC_1` | `Iec104MeasuredValue` | Short floating point measured value and QDS quality flags |
 | 15 | `M_IT_NA_1` | `Iec104IntegratedTotalsValue` | Binary counter reading and sequence/quality flags |
+| 20 | `M_PS_NA_1` | `Iec104PackedSinglePointValue` | 16 single-point states, 16 change-detection bits, QDS quality flags |
 | 21 | `M_ME_ND_1` | `Iec104MeasuredValue` | Normalized measured value without quality descriptor |
 | 30 | `M_SP_TB_1` | `Iec104SinglePointValue` | Single-point SOE value, SIQ quality flags, CP56Time2a |
 | 31 | `M_DP_TB_1` | `Iec104DoublePointValue` | Double-point SOE value, DIQ quality flags, CP56Time2a |
@@ -78,7 +79,6 @@ full IEC60870-5 catalog.
 
 | Type ID | ASDU type | Description | Suggested priority |
 | --- | --- | --- | --- |
-| 20 | `M_PS_NA_1` | Packed single-point information with status change detection | Medium |
 | 38 | `M_EP_TD_1` | Event of protection equipment with CP56Time2a | Low |
 | 39 | `M_EP_TE_1` | Packed start events of protection equipment with CP56Time2a | Low |
 | 40 | `M_EP_TF_1` | Packed output circuit information with CP56Time2a | Low |

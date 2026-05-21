@@ -82,6 +82,7 @@ Typed values currently include:
 - `Iec104BitstringValue`
 - `Iec104MeasuredValue`
 - `Iec104IntegratedTotalsValue`
+- `Iec104PackedSinglePointValue`
 - `Iec104Cp56Time2a`
 - `Iec104QualityDescriptor`
 - `Iec104SingleCommandValue`

@@ -20,6 +20,7 @@ public class Iec104AsduSupportMatrixTest {
             Iec104AsduType.M_ME_NB_1,
             Iec104AsduType.M_ME_NC_1,
             Iec104AsduType.M_IT_NA_1,
+            Iec104AsduType.M_PS_NA_1,
             Iec104AsduType.M_ME_ND_1,
             Iec104AsduType.M_SP_TB_1,
             Iec104AsduType.M_DP_TB_1,
@@ -72,7 +73,7 @@ public class Iec104AsduSupportMatrixTest {
 
     @Test
     public void keepsExpectedSupportCountsExplicit() {
-        assertEquals(37, TYPED_VALUE_TYPES.size());
+        assertEquals(38, TYPED_VALUE_TYPES.size());
     }
 
     @Test

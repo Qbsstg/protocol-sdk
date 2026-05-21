@@ -9,6 +9,7 @@ public enum Iec104AsduType {
     M_ME_NB_1(11, "measured value, scaled", 3),
     M_ME_NC_1(13, "measured value, short floating point", 5),
     M_IT_NA_1(15, "integrated totals", 5),
+    M_PS_NA_1(20, "packed single-point information with status change detection", 5),
     M_ME_ND_1(21, "measured value, normalized without quality descriptor", 2),
     M_SP_TB_1(30, "single-point information with CP56Time2a", 8),
     M_DP_TB_1(31, "double-point information with CP56Time2a", 8),

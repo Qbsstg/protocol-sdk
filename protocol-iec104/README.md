@@ -36,6 +36,7 @@ ASDU types.
 | `M_ME_ND_1` | `Iec104MeasuredValue` | Normalized signed value without quality descriptor |
 | `M_IT_NA_1` | `Iec104IntegratedTotalsValue` | Binary counter reading and sequence/quality flags |
 | `M_IT_TB_1` | `Iec104IntegratedTotalsValue` | Binary counter reading, sequence/quality flags, CP56Time2a |
+| `M_PS_NA_1` | `Iec104PackedSinglePointValue` | 16 single-point states, 16 change-detection bits, QDS quality bits |
 | `C_SC_NA_1` | `Iec104SingleCommandValue` | Single command state, select/execute bit, command qualifier |
 | `C_DC_NA_1` | `Iec104DoubleCommandValue` | Double command state, select/execute bit, command qualifier |
 | `C_RC_NA_1` | `Iec104RegulatingStepCommandValue` | Regulating step command state, select/execute bit, command qualifier |
@@ -117,6 +118,10 @@ transient-state flag.
 
 `Iec104IntegratedTotalsValue` parses the 32-bit signed binary counter reading,
 sequence number, carry, adjusted, and invalid flags.
+
+`Iec104PackedSinglePointValue` parses the SCD field as 16 single-point state
+bits and 16 status-change detection bits. Use `isOn(index)` and
+`hasStatusChanged(index)` for point indices `0..15`.
 
 `Iec104Cp56Time2a` parses local date-time fields only. It does not assign a
 time zone because IEC104 CP56Time2a does not carry one.
