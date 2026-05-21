@@ -87,6 +87,12 @@ public final class Iec104AsduSupport {
                 return typed(asduType, Iec104ResetProcessCommandValue.class);
             case C_CD_NA_1:
                 return typed(asduType, Iec104DelayAcquisitionCommandValue.class);
+            case P_ME_NA_1:
+            case P_ME_NB_1:
+            case P_ME_NC_1:
+                return typed(asduType, Iec104ParameterMeasuredValue.class);
+            case P_AC_NA_1:
+                return typed(asduType, Iec104ParameterActivationValue.class);
             case UNKNOWN:
             default:
                 return unknown();

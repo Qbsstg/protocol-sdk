@@ -42,6 +42,10 @@ public enum Iec104AsduType {
     C_CS_NA_1(103, "clock synchronization command", 7),
     C_RP_NA_1(105, "reset process command", 1),
     C_CD_NA_1(106, "delay acquisition command", 2),
+    P_ME_NA_1(110, "parameter of measured value, normalized", 3),
+    P_ME_NB_1(111, "parameter of measured value, scaled", 3),
+    P_ME_NC_1(112, "parameter of measured value, short floating point", 5),
+    P_AC_NA_1(113, "parameter activation", 1),
     UNKNOWN(-1, "unknown", -1);
 
     private final int typeId;

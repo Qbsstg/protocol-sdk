@@ -52,7 +52,11 @@ public class Iec104AsduSupportMatrixTest {
             Iec104AsduType.C_RD_NA_1,
             Iec104AsduType.C_CS_NA_1,
             Iec104AsduType.C_RP_NA_1,
-            Iec104AsduType.C_CD_NA_1);
+            Iec104AsduType.C_CD_NA_1,
+            Iec104AsduType.P_ME_NA_1,
+            Iec104AsduType.P_ME_NB_1,
+            Iec104AsduType.P_ME_NC_1,
+            Iec104AsduType.P_AC_NA_1);
 
     @Test
     public void classifiesEveryKnownAsduType() {
@@ -76,7 +80,7 @@ public class Iec104AsduSupportMatrixTest {
 
     @Test
     public void keepsExpectedSupportCountsExplicit() {
-        assertEquals(41, TYPED_VALUE_TYPES.size());
+        assertEquals(45, TYPED_VALUE_TYPES.size());
     }
 
     @Test
@@ -92,6 +96,10 @@ public class Iec104AsduSupportMatrixTest {
         Iec104AsduSupport protectionEvent = Iec104AsduSupport.ofTypeId(38);
         assertTrue(protectionEvent.hasTypedValue());
         assertEquals(Iec104SingleProtectionEventValue.class, protectionEvent.getValueClass());
+
+        Iec104AsduSupport parameterMeasured = Iec104AsduSupport.ofTypeId(110);
+        assertTrue(parameterMeasured.hasTypedValue());
+        assertEquals(Iec104ParameterMeasuredValue.class, parameterMeasured.getValueClass());
 
         Iec104AsduSupport unknown = Iec104AsduSupport.ofTypeId(200);
         assertTrue(unknown.isUnknownType());

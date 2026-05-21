@@ -67,6 +67,10 @@ if (support.hasTypedValue()) {
 | 103 | `C_CS_NA_1` | `Iec104ClockSynchronizationCommandValue` | CP56Time2a clock synchronization value |
 | 105 | `C_RP_NA_1` | `Iec104ResetProcessCommandValue` | Reset process qualifier |
 | 106 | `C_CD_NA_1` | `Iec104DelayAcquisitionCommandValue` | CP16Time2a delay acquisition value in milliseconds |
+| 110 | `P_ME_NA_1` | `Iec104ParameterMeasuredValue` | Normalized measured parameter value and QPM qualifier |
+| 111 | `P_ME_NB_1` | `Iec104ParameterMeasuredValue` | Scaled measured parameter value and QPM qualifier |
+| 112 | `P_ME_NC_1` | `Iec104ParameterMeasuredValue` | Short floating point measured parameter value and QPM qualifier |
+| 113 | `P_AC_NA_1` | `Iec104ParameterActivationValue` | Parameter activation qualifier |
 
 ## Recognized Raw-only Types
 
@@ -76,16 +80,8 @@ recognized ASDU type currently returns a typed value from
 
 ## Common ASDU Gaps
 
-The following common IEC104 type IDs are not yet listed in `Iec104AsduType`.
-They are useful candidates for future work. This is a practical backlog, not a
-full IEC60870-5 catalog.
-
-| Type ID | ASDU type | Description | Suggested priority |
-| --- | --- | --- | --- |
-| 110 | `P_ME_NA_1` | Parameter of measured normalized value | Low |
-| 111 | `P_ME_NB_1` | Parameter of measured scaled value | Low |
-| 112 | `P_ME_NC_1` | Parameter of measured short floating point value | Low |
-| 113 | `P_AC_NA_1` | Parameter activation | Low |
+There are no common ASDU gaps in the current practical backlog. Expand this
+section when the next IEC104 type group is selected.
 
 ## Maintenance Rule
 
