@@ -30,6 +30,9 @@ public class Iec104AsduSupportMatrixTest {
             Iec104AsduType.M_ME_TE_1,
             Iec104AsduType.M_ME_TF_1,
             Iec104AsduType.M_IT_TB_1,
+            Iec104AsduType.M_EP_TD_1,
+            Iec104AsduType.M_EP_TE_1,
+            Iec104AsduType.M_EP_TF_1,
             Iec104AsduType.C_SC_NA_1,
             Iec104AsduType.C_DC_NA_1,
             Iec104AsduType.C_RC_NA_1,
@@ -73,7 +76,7 @@ public class Iec104AsduSupportMatrixTest {
 
     @Test
     public void keepsExpectedSupportCountsExplicit() {
-        assertEquals(38, TYPED_VALUE_TYPES.size());
+        assertEquals(41, TYPED_VALUE_TYPES.size());
     }
 
     @Test
@@ -85,6 +88,10 @@ public class Iec104AsduSupportMatrixTest {
         Iec104AsduSupport clockSynchronization = Iec104AsduSupport.ofTypeId(103);
         assertTrue(clockSynchronization.hasTypedValue());
         assertEquals(Iec104ClockSynchronizationCommandValue.class, clockSynchronization.getValueClass());
+
+        Iec104AsduSupport protectionEvent = Iec104AsduSupport.ofTypeId(38);
+        assertTrue(protectionEvent.hasTypedValue());
+        assertEquals(Iec104SingleProtectionEventValue.class, protectionEvent.getValueClass());
 
         Iec104AsduSupport unknown = Iec104AsduSupport.ofTypeId(200);
         assertTrue(unknown.isUnknownType());

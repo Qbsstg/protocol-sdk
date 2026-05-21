@@ -83,6 +83,10 @@ Typed values currently include:
 - `Iec104MeasuredValue`
 - `Iec104IntegratedTotalsValue`
 - `Iec104PackedSinglePointValue`
+- `Iec104SingleProtectionEventValue`
+- `Iec104PackedStartEventsValue`
+- `Iec104PackedOutputCircuitValue`
+- `Iec104ProtectionQualityDescriptor`
 - `Iec104Cp56Time2a`
 - `Iec104QualityDescriptor`
 - `Iec104SingleCommandValue`

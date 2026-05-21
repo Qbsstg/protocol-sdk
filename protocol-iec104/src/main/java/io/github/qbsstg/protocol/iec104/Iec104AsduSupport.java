@@ -50,6 +50,12 @@ public final class Iec104AsduSupport {
                 return typed(asduType, Iec104IntegratedTotalsValue.class);
             case M_PS_NA_1:
                 return typed(asduType, Iec104PackedSinglePointValue.class);
+            case M_EP_TD_1:
+                return typed(asduType, Iec104SingleProtectionEventValue.class);
+            case M_EP_TE_1:
+                return typed(asduType, Iec104PackedStartEventsValue.class);
+            case M_EP_TF_1:
+                return typed(asduType, Iec104PackedOutputCircuitValue.class);
             case C_SC_NA_1:
             case C_SC_TA_1:
                 return typed(asduType, Iec104SingleCommandValue.class);
