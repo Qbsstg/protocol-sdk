@@ -1,25 +1,17 @@
 # Protocol SDK
 
-This repository contains a standalone protocol parsing SDK. It is intentionally
-separate from any collector runtime. The SDK only owns protocol parsing and
-strongly typed protocol models.
+Protocol SDK is a standalone Java protocol parsing SDK. It is split from a
+legacy collector runtime and intentionally keeps only protocol parsing,
+streaming decoders, and strongly typed protocol models.
 
-## Modules
+The first published module is IEC 60870-5-104. The SDK does not depend on
+Spring, Netty, databases, Redis, message queues, or collector runtime globals.
 
-- `protocol-core`: shared Java 8 compatible parser contracts and result types.
-- `protocol-iec104`: IEC60870-5-104 frame, ASDU, information object, and typed value parser.
+## Maven Central
 
-Planned modules:
+Latest stable release: `0.1.0`
 
-- `protocol-iec101`
-- `protocol-iec103`
-- `protocol-modbus`
-- `protocol-http`
-
-## Dependency
-
-After the SDK is published, applications should depend on protocol modules
-directly instead of the parent POM:
+Use the protocol module directly in applications:
 
 ```xml
 <dependency>
@@ -29,9 +21,24 @@ directly instead of the parent POM:
 </dependency>
 ```
 
-The parent `protocol-sdk` POM is only for building the SDK workspace.
+The shared core contracts are published separately and are pulled transitively
+by `protocol-iec104`:
+
+```xml
+<dependency>
+    <groupId>io.github.qbsstg</groupId>
+    <artifactId>protocol-core</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+The parent `protocol-sdk` POM is for building this repository. Most users should
+depend on protocol modules such as `protocol-iec104`.
 
 ## Quick Usage
+
+The decoder is stream-oriented. It buffers incomplete APDUs internally, so
+callers can feed bytes directly from TCP packets without pre-splitting frames.
 
 ```java
 import io.github.qbsstg.protocol.core.ParseResult;
@@ -42,29 +49,77 @@ import io.github.qbsstg.protocol.iec104.Iec104StreamDecoder;
 
 import java.util.List;
 
-Iec104StreamDecoder decoder = new Iec104StreamDecoder();
-List<ParseResult<Iec104Frame>> results = decoder.decode(new byte[] {
-        0x68, 0x0E,
-        0x00, 0x00, 0x00, 0x00,
-        0x01, 0x01, 0x03, 0x00,
-        0x01, 0x00, 0x01, 0x00, 0x00, 0x01
-});
+public final class Iec104Example {
+    public static void main(String[] args) {
+        Iec104StreamDecoder decoder = new Iec104StreamDecoder();
 
-ParseResult<Iec104Frame> result = results.get(0);
-if (result.isSuccess()) {
-    Iec104Frame frame = result.getFrame();
-    Iec104InformationObject object = frame.getAsdu().getInformationObjects().get(0);
-    Iec104SinglePointValue value = (Iec104SinglePointValue) object.getValue();
-    boolean on = value.isOn();
+        List<ParseResult<Iec104Frame>> results = decoder.decode(bytes(
+                0x68, 0x15,
+                0x00, 0x00, 0x00, 0x00,
+                0x1E, 0x01, 0x03, 0x00,
+                0x01, 0x00, 0x01, 0x00, 0x00,
+                0x01, 0xE8, 0x03, 0x15, 0x10, 0x15, 0x05, 0x1A));
+
+        ParseResult<Iec104Frame> result = results.get(0);
+        if (!result.isSuccess()) {
+            throw new IllegalStateException(result.getMessage());
+        }
+
+        Iec104Frame frame = result.getFrame();
+        Iec104InformationObject object = frame.getAsdu().getInformationObjects().get(0);
+        Iec104SinglePointValue value = (Iec104SinglePointValue) object.getValue();
+
+        System.out.println("type=" + frame.getAsdu().getType());
+        System.out.println("address=" + object.getAddress());
+        System.out.println("on=" + value.isOn());
+        System.out.println("time=" + value.getTimeTag().getDateTime());
+    }
+
+    private static byte[] bytes(int... values) {
+        byte[] bytes = new byte[values.length];
+        for (int i = 0; i < values.length; i++) {
+            bytes[i] = (byte) (values[i] & 0xFF);
+        }
+        return bytes;
+    }
 }
 ```
 
-The decoder is stream-oriented. It buffers incomplete APDUs internally, so
-callers can feed bytes directly from TCP packets without pre-splitting frames.
+For more examples, see
+[`Iec104SdkUsageExampleTest`](protocol-iec104/src/test/java/io/github/qbsstg/protocol/iec104/Iec104SdkUsageExampleTest.java).
 
-## Public API Shape
+## Modules
 
-The current API is layered:
+| Module | Status | Purpose |
+| --- | --- | --- |
+| `protocol-core` | Published | Shared Java 8 compatible parser contracts and result types. |
+| `protocol-iec104` | Published | IEC 60870-5-104 APDU, ASDU, information object, and typed value parser. |
+| `protocol-iec101` | Planned | IEC 60870-5-101 parser. |
+| `protocol-iec103` | Planned | IEC 60870-5-103 parser. |
+| `protocol-modbus` | Planned | Modbus TCP/UDP parser. |
+| `protocol-http` | Planned | HTTP protocol helpers for collection scenarios. |
+
+## IEC104 Coverage
+
+`protocol-iec104` currently recognizes 45 ASDU types and returns typed values
+for every recognized type. Unknown type IDs are preserved as raw bytes for
+diagnostics and vendor-specific handling.
+
+Typed coverage includes:
+
+- Single point, double point, step position, bitstring, measured values, and
+  integrated totals.
+- Time-tagged variants with `CP56Time2a`.
+- Packed single-point information and protection event groups.
+- Single, double, regulating step, set point, bitstring, interrogation, counter
+  interrogation, read, clock synchronization, reset process, and delay
+  acquisition commands.
+- Parameter measured values and parameter activation.
+
+The detailed matrix is maintained in
+[`protocol-iec104/docs/asdu-support-matrix.md`](protocol-iec104/docs/asdu-support-matrix.md).
+
+## API Shape
 
 - `ByteStreamDecoder<T>`: streaming parser contract.
 - `ParseResult<T>`: success, incomplete, or error result.
@@ -74,88 +129,47 @@ The current API is layered:
 - `Iec104InformationValue`: marker interface for typed IEC104 values.
 - `Iec104AsduSupport`: typed/raw-only/unknown support status for ASDU types.
 
-Typed values currently include:
-
-- `Iec104SinglePointValue`
-- `Iec104DoublePointValue`
-- `Iec104StepPositionValue`
-- `Iec104BitstringValue`
-- `Iec104MeasuredValue`
-- `Iec104IntegratedTotalsValue`
-- `Iec104PackedSinglePointValue`
-- `Iec104SingleProtectionEventValue`
-- `Iec104PackedStartEventsValue`
-- `Iec104PackedOutputCircuitValue`
-- `Iec104ProtectionQualityDescriptor`
-- `Iec104ParameterMeasuredValue`
-- `Iec104ParameterQualifier`
-- `Iec104ParameterActivationValue`
-- `Iec104Cp56Time2a`
-- `Iec104QualityDescriptor`
-- `Iec104SingleCommandValue`
-- `Iec104DoubleCommandValue`
-- `Iec104RegulatingStepCommandValue`
-- `Iec104SetPointCommandValue`
-- `Iec104BitstringCommandValue`
-- `Iec104InterrogationCommandValue`
-- `Iec104CounterInterrogationCommandValue`
-- `Iec104ReadCommandValue`
-- `Iec104ClockSynchronizationCommandValue`
-- `Iec104ResetProcessCommandValue`
-- `Iec104DelayAcquisitionCommandValue`
-
 Raw bytes remain available on frames, ASDUs, and information objects. This is
-intentional: protocol integrations often need raw bytes for diagnostics and for
-handling vendor-specific edge cases.
+intentional because protocol integrations often need raw bytes for diagnostics
+and for vendor-specific edge cases.
 
-## Design Constraints
+## Compatibility
 
-- No Spring, Netty, MySQL, Redis, RabbitMQ, or runtime global state.
-- Public APIs should be strongly typed. Do not expose the legacy
-  `Map<String, Object>` parser contract.
-- Source remains Java 8 compatible.
-- Release builds may use JDK 21 with `--release 8`.
-- Parser modules must not depend on collector runtime packages.
+- Source compatibility target: Java 8.
+- Release builds can run on JDK 21 with `--release 8`.
+- CI verifies the project on JDK 8 and JDK 21.
+- The current `main` branch uses the next development version
+  `0.1.1-SNAPSHOT`; use `0.1.0` for stable Maven Central consumption.
 
-## Maven Central Package Plan
-
-The intended Maven coordinates are:
-
-| Module | Artifact |
-| --- | --- |
-| Parent build | `io.github.qbsstg:protocol-sdk` |
-| Core contracts | `io.github.qbsstg:protocol-core` |
-| IEC104 parser | `io.github.qbsstg:protocol-iec104` |
-| Future IEC101 parser | `io.github.qbsstg:protocol-iec101` |
-| Future IEC103 parser | `io.github.qbsstg:protocol-iec103` |
-| Future Modbus parser | `io.github.qbsstg:protocol-modbus` |
-| Future HTTP protocol helpers | `io.github.qbsstg:protocol-http` |
-
-Before public release, the repository still needs:
-
-- Central Portal token and GPG key setup in the release environment.
-- More conformance tests with real-world frames.
-
-The build already attaches source and Javadoc jars during `verify`, so release
-artifacts can be checked locally before publishing credentials are configured:
+## Build
 
 ```bash
 mvn -q verify
 ```
 
-For the Maven Central release flow, see
-[`docs/release.md`](docs/release.md).
-
-## Local Verification
-
-```bash
-mvn -q test
-```
-
-Java 8 compatibility check:
+Java 8 compatibility check used by local development:
 
 ```bash
 JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home \
 PATH=/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/bin:$PATH \
-mvn -q test
+mvn -q verify
 ```
+
+Release artifacts include source jars, Javadoc jars, checksums, and GPG
+signatures. The release process is documented in
+[`docs/release.md`](docs/release.md).
+
+## Design Constraints
+
+- Keep parser modules independent from collector runtimes.
+- Do not introduce Spring, Netty, database, Redis, MQ, or runtime global
+  dependencies into protocol modules.
+- Prefer strongly typed protocol models over `Map<String, Object>` style
+  parser output.
+- Preserve raw bytes wherever useful for diagnostics and unsupported edge cases.
+
+## Roadmap
+
+- Complete an IEC104 conformance and gap audit before adding more IEC104 types.
+- Add IEC101, IEC103, and Modbus modules as separate SDK modules.
+- Build a future collector runtime on JDK 21 outside this SDK repository.
