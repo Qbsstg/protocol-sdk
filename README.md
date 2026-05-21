@@ -133,7 +133,7 @@ The intended Maven coordinates are:
 
 Before public release, the repository still needs:
 
-- Maven Central publishing configuration and signing.
+- Central Portal token and GPG key setup in the release environment.
 - More conformance tests with real-world frames.
 
 The build already attaches source and Javadoc jars during `verify`, so release
@@ -142,6 +142,9 @@ artifacts can be checked locally before publishing credentials are configured:
 ```bash
 mvn -q verify
 ```
+
+For the Maven Central release flow, see
+[`docs/release.md`](docs/release.md).
 
 ## Local Verification
 
