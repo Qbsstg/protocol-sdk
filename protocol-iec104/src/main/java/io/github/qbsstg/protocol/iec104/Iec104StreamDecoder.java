@@ -262,6 +262,14 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
                 return parseResetProcessCommandValue(asduType, elementBytes);
             case C_CD_NA_1:
                 return parseDelayAcquisitionCommandValue(asduType, elementBytes);
+            case P_ME_NA_1:
+                return parseNormalizedParameterMeasuredValue(asduType, elementBytes);
+            case P_ME_NB_1:
+                return parseScaledParameterMeasuredValue(asduType, elementBytes);
+            case P_ME_NC_1:
+                return parseShortFloatParameterMeasuredValue(asduType, elementBytes);
+            case P_AC_NA_1:
+                return parseParameterActivationValue(asduType, elementBytes);
             default:
                 return null;
         }
@@ -519,6 +527,42 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
             return null;
         }
         return new Iec104DelayAcquisitionCommandValue(asduType, readUnsignedLittleEndian(elementBytes, 0, 2));
+    }
+
+    private Iec104ParameterMeasuredValue parseNormalizedParameterMeasuredValue(Iec104AsduType asduType,
+                                                                              byte[] elementBytes) {
+        if (elementBytes.length < 3) {
+            return null;
+        }
+        return Iec104ParameterMeasuredValue.normalized(asduType, readSignedLittleEndian16(elementBytes, 0),
+                new Iec104ParameterQualifier(ByteArrayUtil.unsignedByte(elementBytes[2])));
+    }
+
+    private Iec104ParameterMeasuredValue parseScaledParameterMeasuredValue(Iec104AsduType asduType,
+                                                                          byte[] elementBytes) {
+        if (elementBytes.length < 3) {
+            return null;
+        }
+        return Iec104ParameterMeasuredValue.scaled(asduType, readSignedLittleEndian16(elementBytes, 0),
+                new Iec104ParameterQualifier(ByteArrayUtil.unsignedByte(elementBytes[2])));
+    }
+
+    private Iec104ParameterMeasuredValue parseShortFloatParameterMeasuredValue(Iec104AsduType asduType,
+                                                                              byte[] elementBytes) {
+        if (elementBytes.length < 5) {
+            return null;
+        }
+        int rawBits = readUnsignedLittleEndian(elementBytes, 0, 4);
+        return Iec104ParameterMeasuredValue.shortFloat(asduType, Float.intBitsToFloat(rawBits), rawBits,
+                new Iec104ParameterQualifier(ByteArrayUtil.unsignedByte(elementBytes[4])));
+    }
+
+    private Iec104ParameterActivationValue parseParameterActivationValue(Iec104AsduType asduType,
+                                                                         byte[] elementBytes) {
+        if (elementBytes.length < 1) {
+            return null;
+        }
+        return new Iec104ParameterActivationValue(asduType, ByteArrayUtil.unsignedByte(elementBytes[0]));
     }
 
     private Iec104Cp56Time2a parseTimeTag(byte[] elementBytes, boolean timeTagged, int offset) {

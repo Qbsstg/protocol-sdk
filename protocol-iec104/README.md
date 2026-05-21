@@ -60,6 +60,10 @@ ASDU types.
 | `C_CS_NA_1` | `Iec104ClockSynchronizationCommandValue` | CP56Time2a clock synchronization value |
 | `C_RP_NA_1` | `Iec104ResetProcessCommandValue` | Reset process qualifier |
 | `C_CD_NA_1` | `Iec104DelayAcquisitionCommandValue` | CP16Time2a delay acquisition value in milliseconds |
+| `P_ME_NA_1` | `Iec104ParameterMeasuredValue` | Normalized measured parameter value and QPM qualifier |
+| `P_ME_NB_1` | `Iec104ParameterMeasuredValue` | Scaled measured parameter value and QPM qualifier |
+| `P_ME_NC_1` | `Iec104ParameterMeasuredValue` | IEEE 754 short float measured parameter value and QPM qualifier |
+| `P_AC_NA_1` | `Iec104ParameterActivationValue` | Parameter activation qualifier |
 
 Unknown or unsupported ASDU types still expose raw frame, ASDU, and information
 object bytes. Their typed value is `null`.
@@ -168,6 +172,16 @@ Command values use `Iec104CommandQualifier`:
   qualifier `1` is general reset process and qualifier `2` is reset event buffer.
 - `Iec104DelayAcquisitionCommandValue` exposes the CP16Time2a delay acquisition
   value as milliseconds.
+
+Parameter values use `Iec104ParameterMeasuredValue`:
+
+- Normalized parameter value: signed little-endian 16-bit integer divided by
+  `32768.0`.
+- Scaled parameter value: signed little-endian 16-bit integer.
+- Short float parameter value: little-endian IEEE 754 32-bit float.
+- `Iec104ParameterQualifier` exposes kind of parameter, local parameter changed,
+  and parameter not in operation flags.
+- `Iec104ParameterActivationValue` exposes the raw activation qualifier.
 
 ## Current Non-goals
 
