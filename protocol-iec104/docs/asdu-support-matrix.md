@@ -80,8 +80,19 @@ recognized ASDU type currently returns a typed value from
 
 ## Common ASDU Gaps
 
-There are no common ASDU gaps in the current practical backlog. Expand this
-section when the next IEC104 type group is selected.
+The current practical 0.1.0 set covers 45 typed Type IDs, but the completeness
+audit identified additional catalog entries and field-level semantics to decide
+before claiming broad IEC104 completeness:
+
+| Gap | Recommended handling |
+| --- | --- |
+| `M_EI_NA_1` end of initialization, Type ID 70 | Add as raw-only or typed after confirming the desired public model. |
+| File transfer Type IDs commonly listed in the 120-126 range | Keep out of the practical default path until real integration demand exists; add raw-only entries first if discoverability becomes important. |
+| Cause-of-transmission codes 37-41 and 44-47 | Expand `Iec104CauseOfTransmission` because the raw cause code is already preserved but the enum does not name these diagnostics yet. |
+| Direct frame-level tests for `M_DP_TB_1`, `M_ME_TD_1`, `M_ME_TE_1`, and `M_ME_TF_1` | Add fixtures and regression tests; these variants currently share parser logic with tested value families. |
+
+See [`iec104-completeness-audit.md`](iec104-completeness-audit.md) for the
+field-level audit and recommended v0.2.0 order.
 
 ## Maintenance Rule
 
