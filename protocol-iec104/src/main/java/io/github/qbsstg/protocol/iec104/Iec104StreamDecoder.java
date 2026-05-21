@@ -216,6 +216,12 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
                 return parseIntegratedTotalsValue(asduType, elementBytes, true);
             case M_PS_NA_1:
                 return parsePackedSinglePointValue(asduType, elementBytes);
+            case M_EP_TD_1:
+                return parseSingleProtectionEventValue(asduType, elementBytes);
+            case M_EP_TE_1:
+                return parsePackedStartEventsValue(asduType, elementBytes);
+            case M_EP_TF_1:
+                return parsePackedOutputCircuitValue(asduType, elementBytes);
             case C_SC_NA_1:
                 return parseSingleCommandValue(asduType, elementBytes, false);
             case C_SC_TA_1:
@@ -362,6 +368,35 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
         return new Iec104PackedSinglePointValue(asduType, readUnsignedLittleEndian(elementBytes, 0, 2),
                 readUnsignedLittleEndian(elementBytes, 2, 2),
                 Iec104QualityDescriptor.status(ByteArrayUtil.unsignedByte(elementBytes[4])));
+    }
+
+    private Iec104SingleProtectionEventValue parseSingleProtectionEventValue(Iec104AsduType asduType,
+                                                                             byte[] elementBytes) {
+        if (elementBytes.length < 10) {
+            return null;
+        }
+        return new Iec104SingleProtectionEventValue(asduType, ByteArrayUtil.unsignedByte(elementBytes[0]),
+                readUnsignedLittleEndian(elementBytes, 1, 2), Iec104Cp56Time2a.parse(elementBytes, 3));
+    }
+
+    private Iec104PackedStartEventsValue parsePackedStartEventsValue(Iec104AsduType asduType,
+                                                                     byte[] elementBytes) {
+        if (elementBytes.length < 11) {
+            return null;
+        }
+        return new Iec104PackedStartEventsValue(asduType, ByteArrayUtil.unsignedByte(elementBytes[0]),
+                new Iec104ProtectionQualityDescriptor(ByteArrayUtil.unsignedByte(elementBytes[1])),
+                readUnsignedLittleEndian(elementBytes, 2, 2), Iec104Cp56Time2a.parse(elementBytes, 4));
+    }
+
+    private Iec104PackedOutputCircuitValue parsePackedOutputCircuitValue(Iec104AsduType asduType,
+                                                                         byte[] elementBytes) {
+        if (elementBytes.length < 11) {
+            return null;
+        }
+        return new Iec104PackedOutputCircuitValue(asduType, ByteArrayUtil.unsignedByte(elementBytes[0]),
+                new Iec104ProtectionQualityDescriptor(ByteArrayUtil.unsignedByte(elementBytes[1])),
+                readUnsignedLittleEndian(elementBytes, 2, 2), Iec104Cp56Time2a.parse(elementBytes, 4));
     }
 
     private Iec104SingleCommandValue parseSingleCommandValue(Iec104AsduType asduType, byte[] elementBytes,

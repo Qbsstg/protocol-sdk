@@ -44,6 +44,9 @@ if (support.hasTypedValue()) {
 | 35 | `M_ME_TE_1` | `Iec104MeasuredValue` | Scaled measured value, QDS quality flags, CP56Time2a |
 | 36 | `M_ME_TF_1` | `Iec104MeasuredValue` | Short floating point measured value, QDS quality flags, CP56Time2a |
 | 37 | `M_IT_TB_1` | `Iec104IntegratedTotalsValue` | Binary counter reading, sequence/quality flags, CP56Time2a |
+| 38 | `M_EP_TD_1` | `Iec104SingleProtectionEventValue` | Protection equipment event state, elapsed time, quality flags, CP56Time2a |
+| 39 | `M_EP_TE_1` | `Iec104PackedStartEventsValue` | Packed start events, relay duration, QDP quality flags, CP56Time2a |
+| 40 | `M_EP_TF_1` | `Iec104PackedOutputCircuitValue` | Packed output circuit information, relay operating time, QDP quality flags, CP56Time2a |
 | 45 | `C_SC_NA_1` | `Iec104SingleCommandValue` | Single command state, select/execute bit, command qualifier |
 | 46 | `C_DC_NA_1` | `Iec104DoubleCommandValue` | Double command state, select/execute bit, command qualifier |
 | 47 | `C_RC_NA_1` | `Iec104RegulatingStepCommandValue` | Regulating step command state, select/execute bit, command qualifier |
@@ -79,9 +82,6 @@ full IEC60870-5 catalog.
 
 | Type ID | ASDU type | Description | Suggested priority |
 | --- | --- | --- | --- |
-| 38 | `M_EP_TD_1` | Event of protection equipment with CP56Time2a | Low |
-| 39 | `M_EP_TE_1` | Packed start events of protection equipment with CP56Time2a | Low |
-| 40 | `M_EP_TF_1` | Packed output circuit information with CP56Time2a | Low |
 | 110 | `P_ME_NA_1` | Parameter of measured normalized value | Low |
 | 111 | `P_ME_NB_1` | Parameter of measured scaled value | Low |
 | 112 | `P_ME_NC_1` | Parameter of measured short floating point value | Low |

@@ -37,6 +37,9 @@ ASDU types.
 | `M_IT_NA_1` | `Iec104IntegratedTotalsValue` | Binary counter reading and sequence/quality flags |
 | `M_IT_TB_1` | `Iec104IntegratedTotalsValue` | Binary counter reading, sequence/quality flags, CP56Time2a |
 | `M_PS_NA_1` | `Iec104PackedSinglePointValue` | 16 single-point states, 16 change-detection bits, QDS quality bits |
+| `M_EP_TD_1` | `Iec104SingleProtectionEventValue` | Protection equipment event state, elapsed time, quality bits, CP56Time2a |
+| `M_EP_TE_1` | `Iec104PackedStartEventsValue` | Packed start events, relay duration, QDP quality bits, CP56Time2a |
+| `M_EP_TF_1` | `Iec104PackedOutputCircuitValue` | Packed output circuit information, relay operating time, QDP quality bits, CP56Time2a |
 | `C_SC_NA_1` | `Iec104SingleCommandValue` | Single command state, select/execute bit, command qualifier |
 | `C_DC_NA_1` | `Iec104DoubleCommandValue` | Double command state, select/execute bit, command qualifier |
 | `C_RC_NA_1` | `Iec104RegulatingStepCommandValue` | Regulating step command state, select/execute bit, command qualifier |
@@ -123,6 +126,10 @@ sequence number, carry, adjusted, and invalid flags.
 bits and 16 status-change detection bits. Use `isOn(index)` and
 `hasStatusChanged(index)` for point indices `0..15`.
 
+Protection event values parse `M_EP_TD_1`, `M_EP_TE_1`, and `M_EP_TF_1`.
+They expose CP16Time2a elapsed/relay time as milliseconds, CP56Time2a event
+time, protection quality flags, and packed bit accessors for the packed forms.
+
 `Iec104Cp56Time2a` parses local date-time fields only. It does not assign a
 time zone because IEC104 CP56Time2a does not carry one.
 
@@ -133,6 +140,14 @@ time zone because IEC104 CP56Time2a does not carry one.
 - `substituted`
 - `blocked`
 - `overflow` for measured values
+
+`Iec104ProtectionQualityDescriptor` exposes protection-event quality flags:
+
+- `invalid`
+- `notTopical`
+- `substituted`
+- `blocked`
+- `elapsedTimeInvalid`
 
 Command values use `Iec104CommandQualifier`:
 
