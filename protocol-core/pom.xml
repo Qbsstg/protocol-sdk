@@ -14,4 +14,5 @@
     <packaging>jar</packaging>
 
     <name>Protocol Core</name>
+    <description>Shared Java 8 compatible parser contracts and result types for Protocol SDK.</description>
 </project>
