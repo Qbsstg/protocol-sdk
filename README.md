@@ -133,9 +133,15 @@ The intended Maven coordinates are:
 
 Before public release, the repository still needs:
 
-- Source and Javadoc jar generation.
 - Maven Central publishing configuration and signing.
 - More conformance tests with real-world frames.
+
+The build already attaches source and Javadoc jars during `verify`, so release
+artifacts can be checked locally before publishing credentials are configured:
+
+```bash
+mvn -q verify
+```
 
 ## Local Verification
 
