@@ -171,5 +171,6 @@ signatures. The release process is documented in
 ## Roadmap
 
 - Complete an IEC104 conformance and gap audit before adding more IEC104 types.
-- Add IEC101, IEC103, and Modbus modules as separate SDK modules.
+- Add IEC101, IEC103, and Modbus modules as separate SDK modules. The IEC101
+  module design is tracked in [`docs/iec101-module-design.md`](docs/iec101-module-design.md).
 - Build a future collector runtime on JDK 21 outside this SDK repository.
