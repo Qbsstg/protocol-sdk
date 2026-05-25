@@ -133,6 +133,11 @@ Raw bytes remain available on frames, ASDUs, and information objects. This is
 intentional because protocol integrations often need raw bytes for diagnostics
 and for vendor-specific edge cases.
 
+`Iec104StreamDecoder` is permissive by default: malformed recognized ASDUs may
+return the information objects that can still be parsed. Use
+`new Iec104StreamDecoder(true)` to enable strict ASDU parsing, where truncated
+recognized information objects are returned as `ParseResult.error()` entries.
+
 ## Compatibility
 
 - Source compatibility target: Java 8.
