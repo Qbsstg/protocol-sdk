@@ -97,7 +97,7 @@ and the
 | `protocol-core` | Published | Shared Java 8 compatible parser contracts and result types. |
 | `protocol-iec104` | Published | IEC 60870-5-104 APDU, ASDU, information object, and typed value parser. |
 | `protocol-iec101` | Experimental | IEC 60870-5-101 FT1.2 frame parser and initial ASDU baseline. |
-| `protocol-iec103` | Planned | IEC 60870-5-103 parser. |
+| `protocol-iec103` | Planned | IEC 60870-5-103 parser for protection relay communication scenarios. [Design note](docs/iec103-module-design.md). |
 | `protocol-modbus` | Experimental | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. [Design note](docs/protocol-modbus-design.md). |
 | `protocol-http` | Planned | HTTP protocol helpers for collection scenarios. |
 
