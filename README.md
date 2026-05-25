@@ -86,7 +86,9 @@ public final class Iec104Example {
 ```
 
 For more examples, see
-[`Iec104SdkUsageExampleTest`](protocol-iec104/src/test/java/io/github/qbsstg/protocol/iec104/Iec104SdkUsageExampleTest.java).
+[`Iec104SdkUsageExampleTest`](protocol-iec104/src/test/java/io/github/qbsstg/protocol/iec104/Iec104SdkUsageExampleTest.java)
+and the
+[`IEC104 API Usage Guide`](protocol-iec104/docs/api-usage.md).
 
 ## Modules
 
@@ -94,9 +96,9 @@ For more examples, see
 | --- | --- | --- |
 | `protocol-core` | Published | Shared Java 8 compatible parser contracts and result types. |
 | `protocol-iec104` | Published | IEC 60870-5-104 APDU, ASDU, information object, and typed value parser. |
-| `protocol-iec101` | Planned | IEC 60870-5-101 parser. |
+| `protocol-iec101` | Experimental | IEC 60870-5-101 FT1.2 frame parser and initial ASDU baseline. |
 | `protocol-iec103` | Planned | IEC 60870-5-103 parser. |
-| `protocol-modbus` | Experimental | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. |
+| `protocol-modbus` | Experimental | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. [Design note](docs/protocol-modbus-design.md). |
 | `protocol-http` | Planned | HTTP protocol helpers for collection scenarios. |
 
 ## IEC104 Coverage
@@ -132,6 +134,15 @@ The detailed matrix is maintained in
 Raw bytes remain available on frames, ASDUs, and information objects. This is
 intentional because protocol integrations often need raw bytes for diagnostics
 and for vendor-specific edge cases.
+
+`Iec104StreamDecoder` is stateful because it buffers incomplete APDUs. Use one
+decoder per TCP stream/session, and call `reset()` only when buffered bytes
+should be discarded, such as after a reconnect.
+
+`Iec104StreamDecoder` is permissive by default: malformed recognized ASDUs may
+return the information objects that can still be parsed. Use
+`new Iec104StreamDecoder(true)` to enable strict ASDU parsing, where truncated
+recognized information objects are returned as `ParseResult.error()` entries.
 
 ## Compatibility
 
@@ -171,5 +182,6 @@ signatures. The release process is documented in
 ## Roadmap
 
 - Complete an IEC104 conformance and gap audit before adding more IEC104 types.
-- Add IEC101, IEC103, and Modbus modules as separate SDK modules.
+- Add IEC101, IEC103, and Modbus modules as separate SDK modules. The IEC101
+  module design is tracked in [`docs/iec101-module-design.md`](docs/iec101-module-design.md).
 - Build a future collector runtime on JDK 21 outside this SDK repository.

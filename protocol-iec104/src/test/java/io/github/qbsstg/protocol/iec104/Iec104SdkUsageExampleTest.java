@@ -6,8 +6,10 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class Iec104SdkUsageExampleTest {
@@ -74,6 +76,35 @@ public class Iec104SdkUsageExampleTest {
         assertEquals(0x4003, object.getAddress());
         assertEquals(Iec104MeasuredValueKind.SHORT_FLOAT, value.getKind());
         assertEquals(10.0d, value.getValue(), 0.000001d);
+    }
+
+    @Test
+    public void checksAsduSupportBeforeCasting() {
+        Iec104AsduSupport support = Iec104AsduSupport.ofTypeId(30);
+
+        assertTrue(support.hasTypedValue());
+        assertEquals(Iec104AsduType.M_SP_TB_1, support.getAsduType());
+        assertEquals(Iec104SinglePointValue.class, support.getValueClass());
+    }
+
+    @Test
+    public void fallsBackToRawBytesForUnknownTypeIds() {
+        Iec104StreamDecoder decoder = new Iec104StreamDecoder();
+
+        List<ParseResult<Iec104Frame>> results = decoder.decode(bytes(
+                0x68, 0x0F,
+                0x00, 0x00, 0x00, 0x00,
+                0x7F, 0x01, 0x03, 0x00,
+                0x01, 0x00, 0x03, 0x02, 0x01,
+                0xAA, 0xBB));
+
+        Iec104Asdu asdu = results.get(0).getFrame().getAsdu();
+        Iec104InformationObject object = asdu.getInformationObjects().get(0);
+
+        assertEquals(Iec104AsduType.UNKNOWN, asdu.getType());
+        assertTrue(Iec104AsduSupport.ofTypeId(asdu.getTypeId()).isUnknownType());
+        assertNull(object.getValue());
+        assertArrayEquals(bytes(0xAA, 0xBB), object.getElementBytes());
     }
 
     private byte[] bytes(int... values) {

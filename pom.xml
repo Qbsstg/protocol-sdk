@@ -49,6 +49,7 @@
     <modules>
         <module>protocol-core</module>
         <module>protocol-iec104</module>
+        <module>protocol-iec101</module>
         <module>protocol-modbus</module>
     </modules>
 
