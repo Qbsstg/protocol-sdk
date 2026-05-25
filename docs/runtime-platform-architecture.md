@@ -284,6 +284,9 @@ CI on JDK 8 and JDK 21.
 8. Add sink modules and deployment assembly after parser and ingress contracts
    are stable.
 
+The detailed ingestion adapter sequence is tracked in
+[`runtime-ingestion-roadmap.md`](runtime-ingestion-roadmap.md).
+
 ## Acceptance Mapping
 
 | Issue #19 criterion | Design answer |
