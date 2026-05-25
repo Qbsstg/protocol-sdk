@@ -115,6 +115,25 @@ public class Iec104BoundaryTest {
     }
 
     @Test
+    public void preservesRawOnlyKnownAsduRawInformationBytes() {
+        Iec104Frame frame = decodeOne(bytes(
+                0x68, 0x10,
+                0x00, 0x00, 0x00, 0x00,
+                0x78, 0x01, 0x03, 0x00,
+                0x01, 0x00, 0x03, 0x02, 0x01,
+                0xAA, 0xBB, 0xCC));
+
+        Iec104Asdu asdu = frame.getAsdu();
+        assertEquals(Iec104AsduType.F_FR_NA_1, asdu.getType());
+        assertEquals(1, asdu.getInformationObjects().size());
+
+        Iec104InformationObject object = asdu.getInformationObjects().get(0);
+        assertEquals(0x010203, object.getAddress());
+        assertArrayEquals(bytes(0xAA, 0xBB, 0xCC), object.getElementBytes());
+        assertNull(object.getValue());
+    }
+
+    @Test
     public void recoversAfterNoiseAndInvalidLength() {
         Iec104StreamDecoder decoder = new Iec104StreamDecoder();
 

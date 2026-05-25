@@ -74,22 +74,32 @@ if (support.hasTypedValue()) {
 
 ## Recognized Raw-only Types
 
-There are no raw-only ASDU types in the current `Iec104AsduType` enum. Every
-recognized ASDU type currently returns a typed value from
-`Iec104InformationObject.getValue()`.
+These Type IDs are listed in `Iec104AsduType` and classified by
+`Iec104AsduSupport`, but the decoder intentionally exposes raw information bytes
+only until typed models are justified by real integration demand.
+
+| Type ID | ASDU type | Coverage |
+| --- | --- | --- |
+| 70 | `M_EI_NA_1` | End of initialization; information element bytes are preserved raw |
+| 120 | `F_FR_NA_1` | File ready; information element bytes are preserved raw |
+| 121 | `F_SR_NA_1` | Section ready; information element bytes are preserved raw |
+| 122 | `F_SC_NA_1` | File call, select, and directory command; information element bytes are preserved raw |
+| 123 | `F_LS_NA_1` | Last section or segment; information element bytes are preserved raw |
+| 124 | `F_AF_NA_1` | File or section acknowledgement; information element bytes are preserved raw |
+| 125 | `F_SG_NA_1` | File segment; information element bytes are preserved raw |
+| 126 | `F_DR_TA_1` | File directory with CP56Time2a; information element bytes are preserved raw |
 
 ## Common ASDU Gaps
 
-The current practical 0.1.0 set covers 45 typed Type IDs, but the completeness
-audit identified additional catalog entries and field-level semantics to decide
-before claiming broad IEC104 completeness:
+The remaining IEC104 gaps are behavior and documentation decisions rather than
+missing support-matrix categories. The current matrix covers the practical typed
+set and classifies recognized initialization/file-transfer catalog entries as
+raw-only.
 
-| Gap | Recommended handling |
-| --- | --- |
-| `M_EI_NA_1` end of initialization, Type ID 70 | Add as raw-only or typed after confirming the desired public model. |
-| File transfer Type IDs commonly listed in the 120-126 range | Keep out of the practical default path until real integration demand exists; add raw-only entries first if discoverability becomes important. |
-| Cause-of-transmission codes 37-41 and 44-47 | Expand `Iec104CauseOfTransmission` because the raw cause code is already preserved but the enum does not name these diagnostics yet. |
-| Direct frame-level tests for `M_DP_TB_1`, `M_ME_TD_1`, `M_ME_TE_1`, and `M_ME_TF_1` | Add fixtures and regression tests; these variants currently share parser logic with tested value families. |
+- Decide whether malformed recognized ASDUs should stay permissive or gain a
+  strict diagnostic mode.
+- Promote raw-only initialization or file-transfer entries to typed values only
+  after real device traces or integration demand justify the public model.
 
 See [`iec104-completeness-audit.md`](iec104-completeness-audit.md) for the
 field-level audit and recommended v0.2.0 order.
