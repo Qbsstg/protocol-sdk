@@ -49,5 +49,8 @@ ASDU support:
   `M_ME_NC_1`, `C_SC_NA_1`, `C_DC_NA_1`, and `C_IC_NA_1`.
 - Raw-byte fallback for unknown Type IDs and raw-only `C_CS_NA_1`.
 
+The detailed support matrix and `0.5.0` completion audit are maintained in
+[`docs/asdu-support-matrix.md`](docs/asdu-support-matrix.md).
+
 This module does not include serial-port handling, polling/session scheduling,
 retry policy, Netty, Spring, databases, Redis, or message queues.
