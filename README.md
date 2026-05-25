@@ -170,6 +170,13 @@ Release artifacts include source jars, Javadoc jars, checksums, and GPG
 signatures. The release process is documented in
 [`docs/release.md`](docs/release.md).
 
+## Runtime Platform
+
+Future collector runtime work is planned as a separate JDK 21 layer that
+consumes these Java 8 compatible SDK modules without adding runtime
+dependencies back into the SDK. The architecture boundary is documented in
+[`docs/runtime-platform-architecture.md`](docs/runtime-platform-architecture.md).
+
 ## Design Constraints
 
 - Keep parser modules independent from collector runtimes.
