@@ -191,8 +191,10 @@ and the ingestion adapter roadmap is documented in
 ## Roadmap
 
 - Complete an IEC104 conformance and gap audit before adding more IEC104 types.
-- Add IEC101, IEC103, and Modbus modules as separate SDK modules. The IEC101
-  module design is tracked in [`docs/iec101-module-design.md`](docs/iec101-module-design.md).
+- Focus the next SDK release phase on IEC101 and IEC103 completion. The SDK
+  release plan is tracked in [`docs/sdk-release-roadmap.md`](docs/sdk-release-roadmap.md).
+- Keep Modbus experimental until the next major SDK phase after IEC101 and
+  IEC103 are complete.
 - Build a future collector runtime on JDK 21 outside this SDK repository. The
   runtime architecture and ingestion roadmap are tracked in
   [`docs/runtime-platform-architecture.md`](docs/runtime-platform-architecture.md)
