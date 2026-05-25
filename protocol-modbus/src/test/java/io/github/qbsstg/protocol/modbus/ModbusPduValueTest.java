@@ -1,0 +1,104 @@
+package io.github.qbsstg.protocol.modbus;
+
+import io.github.qbsstg.protocol.core.ParseResult;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ModbusPduValueTest {
+
+    @Test
+    public void decodesReadCoilsResponseBitsLeastSignificantBitFirst() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x02, 0x00, 0x00, 0x00, 0x04,
+                0x11, 0x01, 0x01, 0x05));
+
+        assertTrue(result.isSuccess());
+
+        ModbusBitValues values = (ModbusBitValues) result.getFrame().getPdu().getValue();
+        assertEquals(1, values.getByteCount());
+        boolean[] bits = values.getValues();
+        assertTrue(bits[0]);
+        assertFalse(bits[1]);
+        assertTrue(bits[2]);
+        assertFalse(bits[3]);
+    }
+
+    @Test
+    public void decodesWriteSingleCoilEcho() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x03, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x05, 0x00, 0xAC, 0xFF, 0x00));
+
+        assertTrue(result.isSuccess());
+
+        ModbusWriteSingleValue value = (ModbusWriteSingleValue) result.getFrame().getPdu().getValue();
+        assertEquals(0x00AC, value.getAddress());
+        assertEquals(0xFF00, value.getValue());
+    }
+
+    @Test
+    public void decodesWriteMultipleCoilsRequest() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x04, 0x00, 0x00, 0x00, 0x09,
+                0x11, 0x0F, 0x00, 0x13, 0x00, 0x0A, 0x02, 0xCD, 0x01));
+
+        assertTrue(result.isSuccess());
+
+        ModbusWriteMultipleBitsValue value =
+                (ModbusWriteMultipleBitsValue) result.getFrame().getPdu().getValue();
+        assertEquals(0x0013, value.getRange().getStartAddress());
+        assertEquals(10, value.getRange().getQuantity());
+        assertEquals(2, value.getByteCount());
+        assertEquals(10, value.getValues().length);
+    }
+
+    @Test
+    public void decodesWriteMultipleRegistersRequest() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x05, 0x00, 0x00, 0x00, 0x0B,
+                0x11, 0x10, 0x00, 0x01, 0x00, 0x02, 0x04, 0x00, 0x0A, 0x01, 0x02));
+
+        assertTrue(result.isSuccess());
+
+        ModbusWriteMultipleRegistersValue value =
+                (ModbusWriteMultipleRegistersValue) result.getFrame().getPdu().getValue();
+        assertEquals(0x0001, value.getRange().getStartAddress());
+        assertEquals(2, value.getRange().getQuantity());
+        assertEquals(4, value.getByteCount());
+        assertArrayEquals(new int[]{10, 258}, value.getValues());
+    }
+
+    @Test
+    public void marksReadWriteMultipleRegistersAsRawOnly() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x06, 0x00, 0x00, 0x00, 0x03,
+                0x11, 0x17, 0x00));
+
+        assertTrue(result.isSuccess());
+        assertEquals(ModbusSupportStatus.RAW_ONLY, result.getFrame().getPdu().getSupport().getStatus());
+        assertTrue(result.getFrame().getPdu().getValue() instanceof ModbusRawValue);
+    }
+
+    private static byte[] bytes(int... values) {
+        byte[] bytes = new byte[values.length];
+        for (int i = 0; i < values.length; i++) {
+            bytes[i] = (byte) (values[i] & 0xFF);
+        }
+        return bytes;
+    }
+}
