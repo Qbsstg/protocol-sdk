@@ -139,6 +139,11 @@ and for vendor-specific edge cases.
 decoder per TCP stream/session, and call `reset()` only when buffered bytes
 should be discarded, such as after a reconnect.
 
+`Iec104StreamDecoder` is permissive by default: malformed recognized ASDUs may
+return the information objects that can still be parsed. Use
+`new Iec104StreamDecoder(true)` to enable strict ASDU parsing, where truncated
+recognized information objects are returned as `ParseResult.error()` entries.
+
 ## Compatibility
 
 - Source compatibility target: Java 8.

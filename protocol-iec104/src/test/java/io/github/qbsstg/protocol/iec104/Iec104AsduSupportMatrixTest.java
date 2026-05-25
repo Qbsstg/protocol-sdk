@@ -58,6 +58,16 @@ public class Iec104AsduSupportMatrixTest {
             Iec104AsduType.P_ME_NC_1,
             Iec104AsduType.P_AC_NA_1);
 
+    private static final EnumSet<Iec104AsduType> RAW_BYTES_ONLY_TYPES = EnumSet.of(
+            Iec104AsduType.M_EI_NA_1,
+            Iec104AsduType.F_FR_NA_1,
+            Iec104AsduType.F_SR_NA_1,
+            Iec104AsduType.F_SC_NA_1,
+            Iec104AsduType.F_LS_NA_1,
+            Iec104AsduType.F_AF_NA_1,
+            Iec104AsduType.F_SG_NA_1,
+            Iec104AsduType.F_DR_TA_1);
+
     @Test
     public void classifiesEveryKnownAsduType() {
         for (Iec104AsduType type : Iec104AsduType.values()) {
@@ -72,6 +82,8 @@ public class Iec104AsduSupportMatrixTest {
             if (TYPED_VALUE_TYPES.contains(type)) {
                 assertTrue(type + " should be typed", support.hasTypedValue());
                 assertNotNull(type + " should declare a value class", support.getValueClass());
+            } else if (RAW_BYTES_ONLY_TYPES.contains(type)) {
+                assertTrue(type + " should be raw-only", support.isRawBytesOnly());
             } else {
                 throw new AssertionError("Type is not categorized by the support matrix test: " + type);
             }
@@ -81,6 +93,7 @@ public class Iec104AsduSupportMatrixTest {
     @Test
     public void keepsExpectedSupportCountsExplicit() {
         assertEquals(45, TYPED_VALUE_TYPES.size());
+        assertEquals(8, RAW_BYTES_ONLY_TYPES.size());
     }
 
     @Test
@@ -100,6 +113,14 @@ public class Iec104AsduSupportMatrixTest {
         Iec104AsduSupport parameterMeasured = Iec104AsduSupport.ofTypeId(110);
         assertTrue(parameterMeasured.hasTypedValue());
         assertEquals(Iec104ParameterMeasuredValue.class, parameterMeasured.getValueClass());
+
+        Iec104AsduSupport endOfInitialization = Iec104AsduSupport.ofTypeId(70);
+        assertTrue(endOfInitialization.isRawBytesOnly());
+        assertEquals(Iec104AsduType.M_EI_NA_1, endOfInitialization.getAsduType());
+
+        Iec104AsduSupport fileReady = Iec104AsduSupport.ofTypeId(120);
+        assertTrue(fileReady.isRawBytesOnly());
+        assertEquals(Iec104AsduType.F_FR_NA_1, fileReady.getAsduType());
 
         Iec104AsduSupport unknown = Iec104AsduSupport.ofTypeId(200);
         assertTrue(unknown.isUnknownType());

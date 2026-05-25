@@ -79,14 +79,33 @@ See [`api-usage.md`](api-usage.md) for end-to-end decoder examples.
 
 ## Recognized Raw-only Types
 
-There are no raw-only ASDU types in the current `Iec104AsduType` enum. Every
-recognized ASDU type currently returns a typed value from
-`Iec104InformationObject.getValue()`.
+These Type IDs are listed in `Iec104AsduType` and classified by
+`Iec104AsduSupport`, but the decoder intentionally exposes raw information bytes
+only until typed models are justified by real integration demand.
+
+| Type ID | ASDU type | Coverage |
+| --- | --- | --- |
+| 70 | `M_EI_NA_1` | End of initialization; information element bytes are preserved raw |
+| 120 | `F_FR_NA_1` | File ready; information element bytes are preserved raw |
+| 121 | `F_SR_NA_1` | Section ready; information element bytes are preserved raw |
+| 122 | `F_SC_NA_1` | File call, select, and directory command; information element bytes are preserved raw |
+| 123 | `F_LS_NA_1` | Last section or segment; information element bytes are preserved raw |
+| 124 | `F_AF_NA_1` | File or section acknowledgement; information element bytes are preserved raw |
+| 125 | `F_SG_NA_1` | File segment; information element bytes are preserved raw |
+| 126 | `F_DR_TA_1` | File directory with CP56Time2a; information element bytes are preserved raw |
 
 ## Common ASDU Gaps
 
-There are no common ASDU gaps in the current practical backlog. Expand this
-section when the next IEC104 type group is selected.
+The remaining IEC104 gaps are behavior and documentation decisions rather than
+missing support-matrix categories. The current matrix covers the practical typed
+set and classifies recognized initialization/file-transfer catalog entries as
+raw-only.
+
+- Promote raw-only initialization or file-transfer entries to typed values only
+  after real device traces or integration demand justify the public model.
+
+See [`iec104-completeness-audit.md`](iec104-completeness-audit.md) for the
+field-level audit and recommended v0.2.0 order.
 
 ## Maintenance Rule
 

@@ -19,6 +19,15 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
     private static final int MAX_APDU_LENGTH = 255;
 
     private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    private final boolean strictAsduParsing;
+
+    public Iec104StreamDecoder() {
+        this(false);
+    }
+
+    public Iec104StreamDecoder(boolean strictAsduParsing) {
+        this.strictAsduParsing = strictAsduParsing;
+    }
 
     public List<ParseResult<Iec104Frame>> decode(byte[] input) {
         if (input != null && input.length > 0) {
@@ -55,12 +64,21 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
             }
 
             byte[] frameBytes = ByteArrayUtil.copyOfRange(bytes, start, start + totalLength);
-            results.add(ParseResult.success(parseFrame(frameBytes), totalLength));
+            String strictError = strictAsduParsing ? validateStrictAsdu(frameBytes) : null;
+            if (strictError != null) {
+                results.add(ParseResult.<Iec104Frame>error(strictError, totalLength));
+            } else {
+                results.add(ParseResult.success(parseFrame(frameBytes), totalLength));
+            }
             position = start + totalLength;
         }
 
         retain(bytes, position);
         return results;
+    }
+
+    public boolean isStrictAsduParsing() {
+        return strictAsduParsing;
     }
 
     public void reset() {
@@ -176,6 +194,81 @@ public final class Iec104StreamDecoder implements ByteStreamDecoder<Iec104Frame>
         }
 
         return objects;
+    }
+
+    private String validateStrictAsdu(byte[] frameBytes) {
+        if (!isIFormat(frameBytes)) {
+            return null;
+        }
+
+        if (frameBytes.length < APCI_LENGTH + ASDU_HEADER_LENGTH) {
+            return "Truncated IEC104 ASDU header: expected " + ASDU_HEADER_LENGTH
+                    + " bytes after APCI, available " + Math.max(0, frameBytes.length - APCI_LENGTH);
+        }
+
+        int asduOffset = APCI_LENGTH;
+        int typeId = ByteArrayUtil.unsignedByte(frameBytes[asduOffset]);
+        Iec104AsduType asduType = Iec104AsduType.fromTypeId(typeId);
+        int elementLength = asduType.getInformationElementLength();
+        if (elementLength < 0) {
+            return null;
+        }
+
+        Iec104VariableStructureQualifier qualifier =
+                new Iec104VariableStructureQualifier(ByteArrayUtil.unsignedByte(frameBytes[asduOffset + 1]));
+        int objectCount = qualifier.getNumberOfObjects();
+        if (objectCount == 0) {
+            return null;
+        }
+
+        int position = APCI_LENGTH + ASDU_HEADER_LENGTH;
+        if (position + INFORMATION_OBJECT_ADDRESS_LENGTH > frameBytes.length) {
+            return truncatedInformationObjectAddress(asduType, 0, frameBytes.length - position);
+        }
+
+        if (qualifier.isSequence()) {
+            position += INFORMATION_OBJECT_ADDRESS_LENGTH;
+            int requiredElementBytes = elementLength * objectCount;
+            int availableElementBytes = frameBytes.length - position;
+            if (availableElementBytes < requiredElementBytes) {
+                return truncatedInformationElement(asduType, objectCount - 1,
+                        requiredElementBytes, availableElementBytes);
+            }
+            return null;
+        }
+
+        for (int i = 0; i < objectCount; i++) {
+            int availableAddressBytes = frameBytes.length - position;
+            if (availableAddressBytes < INFORMATION_OBJECT_ADDRESS_LENGTH) {
+                return truncatedInformationObjectAddress(asduType, i, availableAddressBytes);
+            }
+            position += INFORMATION_OBJECT_ADDRESS_LENGTH;
+
+            int availableElementBytes = frameBytes.length - position;
+            if (availableElementBytes < elementLength) {
+                return truncatedInformationElement(asduType, i, elementLength, availableElementBytes);
+            }
+            position += elementLength;
+        }
+
+        return null;
+    }
+
+    private boolean isIFormat(byte[] frameBytes) {
+        return (ByteArrayUtil.unsignedByte(frameBytes[2]) & 0x01) == 0;
+    }
+
+    private String truncatedInformationObjectAddress(Iec104AsduType asduType, int objectIndex, int availableBytes) {
+        return "Truncated IEC104 information object address for " + asduType
+                + " at index " + objectIndex + ": expected " + INFORMATION_OBJECT_ADDRESS_LENGTH
+                + " bytes, available " + Math.max(0, availableBytes);
+    }
+
+    private String truncatedInformationElement(Iec104AsduType asduType, int objectIndex,
+                                               int expectedBytes, int availableBytes) {
+        return "Truncated IEC104 information element for " + asduType
+                + " at index " + objectIndex + ": expected " + expectedBytes
+                + " bytes, available " + Math.max(0, availableBytes);
     }
 
     private Iec104InformationValue parseInformationValue(Iec104AsduType asduType, byte[] elementBytes) {

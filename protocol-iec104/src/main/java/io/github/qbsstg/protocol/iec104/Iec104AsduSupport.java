@@ -93,6 +93,15 @@ public final class Iec104AsduSupport {
                 return typed(asduType, Iec104ParameterMeasuredValue.class);
             case P_AC_NA_1:
                 return typed(asduType, Iec104ParameterActivationValue.class);
+            case M_EI_NA_1:
+            case F_FR_NA_1:
+            case F_SR_NA_1:
+            case F_SC_NA_1:
+            case F_LS_NA_1:
+            case F_AF_NA_1:
+            case F_SG_NA_1:
+            case F_DR_TA_1:
+                return rawBytesOnly(asduType);
             case UNKNOWN:
             default:
                 return unknown();
@@ -131,6 +140,11 @@ public final class Iec104AsduSupport {
                                            Class<? extends Iec104InformationValue> valueClass) {
         return new Iec104AsduSupport(asduType, Iec104AsduSupportStatus.TYPED_VALUE, valueClass,
                 "Decoder returns " + valueClass.getSimpleName() + " from Iec104InformationObject.getValue().");
+    }
+
+    private static Iec104AsduSupport rawBytesOnly(Iec104AsduType asduType) {
+        return new Iec104AsduSupport(asduType, Iec104AsduSupportStatus.RAW_BYTES_ONLY, null,
+                "ASDU type is recognized, but decoder intentionally exposes raw information bytes only.");
     }
 
     private static Iec104AsduSupport unknown() {

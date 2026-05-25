@@ -36,6 +36,7 @@ public enum Iec104AsduType {
     C_SE_TB_1(62, "set point command, scaled with CP56Time2a", 10),
     C_SE_TC_1(63, "set point command, short floating point with CP56Time2a", 12),
     C_BO_TA_1(64, "bitstring command with CP56Time2a", 12),
+    M_EI_NA_1(70, "end of initialization", -1),
     C_IC_NA_1(100, "interrogation command", 1),
     C_CI_NA_1(101, "counter interrogation command", 1),
     C_RD_NA_1(102, "read command", 0),
@@ -46,6 +47,13 @@ public enum Iec104AsduType {
     P_ME_NB_1(111, "parameter of measured value, scaled", 3),
     P_ME_NC_1(112, "parameter of measured value, short floating point", 5),
     P_AC_NA_1(113, "parameter activation", 1),
+    F_FR_NA_1(120, "file ready", -1),
+    F_SR_NA_1(121, "section ready", -1),
+    F_SC_NA_1(122, "file call, select, directory command", -1),
+    F_LS_NA_1(123, "last section or segment", -1),
+    F_AF_NA_1(124, "file or section acknowledgement", -1),
+    F_SG_NA_1(125, "file segment", -1),
+    F_DR_TA_1(126, "file directory with CP56Time2a", -1),
     UNKNOWN(-1, "unknown", -1);
 
     private final int typeId;
