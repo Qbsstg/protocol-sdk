@@ -86,7 +86,9 @@ public final class Iec104Example {
 ```
 
 For more examples, see
-[`Iec104SdkUsageExampleTest`](protocol-iec104/src/test/java/io/github/qbsstg/protocol/iec104/Iec104SdkUsageExampleTest.java).
+[`Iec104SdkUsageExampleTest`](protocol-iec104/src/test/java/io/github/qbsstg/protocol/iec104/Iec104SdkUsageExampleTest.java)
+and the
+[`IEC104 API Usage Guide`](protocol-iec104/docs/api-usage.md).
 
 ## Modules
 
@@ -132,6 +134,10 @@ The detailed matrix is maintained in
 Raw bytes remain available on frames, ASDUs, and information objects. This is
 intentional because protocol integrations often need raw bytes for diagnostics
 and for vendor-specific edge cases.
+
+`Iec104StreamDecoder` is stateful because it buffers incomplete APDUs. Use one
+decoder per TCP stream/session, and call `reset()` only when buffered bytes
+should be discarded, such as after a reconnect.
 
 `Iec104StreamDecoder` is permissive by default: malformed recognized ASDUs may
 return the information objects that can still be parsed. Use

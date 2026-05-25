@@ -19,8 +19,13 @@ Applications can query support status with:
 Iec104AsduSupport support = Iec104AsduSupport.ofTypeId(typeId);
 if (support.hasTypedValue()) {
     Class<? extends Iec104InformationValue> valueClass = support.getValueClass();
+} else if (support.isRawBytesOnly() || support.isUnknownType()) {
+    // Read raw bytes from Iec104Asdu.getRawBytes() or
+    // Iec104InformationObject.getElementBytes().
 }
 ```
+
+See [`api-usage.md`](api-usage.md) for end-to-end decoder examples.
 
 ## Typed Value Coverage
 
@@ -96,8 +101,6 @@ missing support-matrix categories. The current matrix covers the practical typed
 set and classifies recognized initialization/file-transfer catalog entries as
 raw-only.
 
-- Decide whether malformed recognized ASDUs should stay permissive or gain a
-  strict diagnostic mode.
 - Promote raw-only initialization or file-transfer entries to typed values only
   after real device traces or integration demand justify the public model.
 
