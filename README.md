@@ -175,7 +175,9 @@ signatures. The release process is documented in
 Future collector runtime work is planned as a separate JDK 21 layer that
 consumes these Java 8 compatible SDK modules without adding runtime
 dependencies back into the SDK. The architecture boundary is documented in
-[`docs/runtime-platform-architecture.md`](docs/runtime-platform-architecture.md).
+[`docs/runtime-platform-architecture.md`](docs/runtime-platform-architecture.md),
+and the ingestion adapter roadmap is documented in
+[`docs/runtime-ingestion-roadmap.md`](docs/runtime-ingestion-roadmap.md).
 
 ## Design Constraints
 
@@ -191,4 +193,7 @@ dependencies back into the SDK. The architecture boundary is documented in
 - Complete an IEC104 conformance and gap audit before adding more IEC104 types.
 - Add IEC101, IEC103, and Modbus modules as separate SDK modules. The IEC101
   module design is tracked in [`docs/iec101-module-design.md`](docs/iec101-module-design.md).
-- Build a future collector runtime on JDK 21 outside this SDK repository.
+- Build a future collector runtime on JDK 21 outside this SDK repository. The
+  runtime architecture and ingestion roadmap are tracked in
+  [`docs/runtime-platform-architecture.md`](docs/runtime-platform-architecture.md)
+  and [`docs/runtime-ingestion-roadmap.md`](docs/runtime-ingestion-roadmap.md).
