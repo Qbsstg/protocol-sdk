@@ -6,7 +6,7 @@
 
     <groupId>io.github.qbsstg</groupId>
     <artifactId>protocol-sdk</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.5.0</version>
     <packaging>pom</packaging>
 
     <name>Protocol SDK</name>

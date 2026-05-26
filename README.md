@@ -9,7 +9,9 @@ Spring, Netty, databases, Redis, message queues, or collector runtime globals.
 
 ## Maven Central
 
-Latest stable release: `0.1.0`
+Release candidate: `0.5.0`
+
+Previous stable release: `0.1.0`
 
 Use the protocol module directly in applications:
 
@@ -17,7 +19,7 @@ Use the protocol module directly in applications:
 <dependency>
     <groupId>io.github.qbsstg</groupId>
     <artifactId>protocol-iec104</artifactId>
-    <version>0.1.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
@@ -28,7 +30,7 @@ by `protocol-iec104`:
 <dependency>
     <groupId>io.github.qbsstg</groupId>
     <artifactId>protocol-core</artifactId>
-    <version>0.1.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
@@ -101,9 +103,8 @@ and the
 | `protocol-modbus` | Experimental | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. [Design note](docs/protocol-modbus-design.md). |
 | `protocol-http` | Planned | HTTP protocol helpers for collection scenarios. |
 
-`0.5.0` candidate means the module is intended for the next SDK completion
-release after the current stable `0.1.0` line. It does not change the latest
-published Maven Central version shown above.
+`0.5.0` candidate means the module is part of the IEC101/IEC103 completion
+release scope. Modbus remains experimental in this release.
 
 ## IEC104 Coverage
 
@@ -153,8 +154,8 @@ recognized information objects are returned as `ParseResult.error()` entries.
 - Source compatibility target: Java 8.
 - Release builds can run on JDK 21 with `--release 8`.
 - CI verifies the project on JDK 8 and JDK 21.
-- The current `main` branch uses the next development version
-  `0.1.1-SNAPSHOT`; use `0.1.0` for stable Maven Central consumption.
+- The current release candidate version is `0.5.0`; `0.1.0` remains the
+  previous stable Maven Central release.
 
 ## Build
 
