@@ -49,8 +49,16 @@ public final class Iec101AsduSupport {
                 return typed(asduType, Iec101DoubleCommandValue.class);
             case C_IC_NA_1:
                 return typed(asduType, Iec101InterrogationCommandValue.class);
+            case C_CI_NA_1:
+                return typed(asduType, Iec101CounterInterrogationCommandValue.class);
+            case C_RD_NA_1:
+                return typed(asduType, Iec101ReadCommandValue.class);
             case C_CS_NA_1:
                 return typed(asduType, Iec101ClockSynchronizationCommandValue.class);
+            case C_RP_NA_1:
+                return typed(asduType, Iec101ResetProcessCommandValue.class);
+            case C_CD_NA_1:
+                return typed(asduType, Iec101DelayAcquisitionCommandValue.class);
             case UNKNOWN:
             default:
                 return unknown();

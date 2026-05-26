@@ -46,7 +46,11 @@ if (support.hasTypedValue()) {
 | 45 | `C_SC_NA_1` | `Iec101SingleCommandValue` | Single command state, select/execute bit, and command qualifier |
 | 46 | `C_DC_NA_1` | `Iec101DoubleCommandValue` | Double command state, select/execute bit, and command qualifier |
 | 100 | `C_IC_NA_1` | `Iec101InterrogationCommandValue` | Station and group interrogation qualifier |
+| 101 | `C_CI_NA_1` | `Iec101CounterInterrogationCommandValue` | Counter interrogation qualifier and freeze/reset mode |
+| 102 | `C_RD_NA_1` | `Iec101ReadCommandValue` | Read command; target address is the information object address |
 | 103 | `C_CS_NA_1` | `Iec101ClockSynchronizationCommandValue` | Clock synchronization command with CP56Time2a |
+| 105 | `C_RP_NA_1` | `Iec101ResetProcessCommandValue` | Reset process qualifier |
+| 106 | `C_CD_NA_1` | `Iec101DelayAcquisitionCommandValue` | CP16Time2a delay acquisition value in milliseconds |
 
 ## Recognized Raw-only Types
 
@@ -66,7 +70,8 @@ justifies the public API.
 | 17, 18, 19 | `M_EP_TA_1`, `M_EP_TB_1`, `M_EP_TC_1` | Protection event payloads should be designed with IEC103/IEC104 event model reuse in mind. |
 | 32, 33, 37 | `M_ST_TB_1`, `M_BO_TB_1`, `M_IT_TB_1` | CP56 variants of deferred value models. |
 | 38, 39, 40 | `M_EP_TD_1`, `M_EP_TE_1`, `M_EP_TF_1` | CP56 protection event variants deferred with the protection event model. |
-| 58-64 | Time-tagged command variants | Deferred to the command/station-service hardening slice. |
+| 47-51 | `C_RC_NA_1`, `C_SE_NA_1`, `C_SE_NB_1`, `C_SE_NC_1`, `C_BO_NA_1` | Regulating step, set point, and bitstring commands are deferred until their value semantics are modeled. |
+| 58-64 | Time-tagged command variants | Deferred until the matching non-time-tagged command models are added. |
 
 ## Unknown Type Behavior
 
@@ -83,7 +88,7 @@ or handle vendor-specific payloads outside the SDK.
 | Configurable link, COT, common-address, and information-object address lengths | Existing fixtures cover one- and two-octet link addresses plus COT, common-address, and information-object address variants. | Add an explicit two-octet information-object address fixture. |
 | ASDU support matrix | This document defines typed, raw-only, and unknown behavior for the current IEC101 catalog. | Keep this document aligned with `Iec101AsduType` and `Iec101AsduSupport`. |
 | Time-tagged IEC101 values | Partially complete. Selected single-point, double-point, normalized/scaled/short-float measured values support CP24Time2a and CP56Time2a through IEC101-named timestamp classes. | Add deferred step, bitstring, integrated totals, protection event, and time-tagged command variants when their base public models are ready. |
-| General interrogation, clock synchronization, and common commands | General interrogation, single command, double command, and clock synchronization are typed. | Add more command/station-service variants. |
+| General interrogation, clock synchronization, and common commands | Single command, double command, interrogation, counter interrogation, read, clock synchronization, reset process, and delay acquisition are typed and fixture-backed. | Add deferred regulating, set point, bitstring, and time-tagged command variants when their base public models are ready. |
 | Usage guide caller responsibilities | README states the module excludes serial handling, scheduling, retries, and runtime frameworks. | Expand into a dedicated API usage guide before `0.5.0`. |
 
 ## Fixture Gaps
@@ -92,9 +97,9 @@ or handle vendor-specific payloads outside the SDK.
 - Explicit balanced-mode control-field function fixtures.
 - Deferred CP24/CP56 step, bitstring, integrated totals, and protection event
   variants.
-- Time-tagged command variants `58-64`.
-- Additional command and station-service variants, including malformed command
-  payloads.
+- Regulating step, set point, bitstring, and time-tagged command variants.
+- Additional malformed station-service payload variants as real traces justify
+  them.
 - Wider raw-only or deferred standard Type ID catalog when enum constants are
   added beyond the current baseline.
 

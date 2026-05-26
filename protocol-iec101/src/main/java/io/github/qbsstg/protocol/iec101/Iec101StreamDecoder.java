@@ -278,8 +278,16 @@ public final class Iec101StreamDecoder implements ByteStreamDecoder<Iec101Frame>
                 return parseDoubleCommandValue(asduType, elementBytes);
             case C_IC_NA_1:
                 return parseInterrogationCommandValue(asduType, elementBytes);
+            case C_CI_NA_1:
+                return parseCounterInterrogationCommandValue(asduType, elementBytes);
+            case C_RD_NA_1:
+                return parseReadCommandValue(asduType);
             case C_CS_NA_1:
                 return parseClockSynchronizationCommandValue(asduType, elementBytes);
+            case C_RP_NA_1:
+                return parseResetProcessCommandValue(asduType, elementBytes);
+            case C_CD_NA_1:
+                return parseDelayAcquisitionCommandValue(asduType, elementBytes);
             default:
                 return null;
         }
@@ -362,12 +370,40 @@ public final class Iec101StreamDecoder implements ByteStreamDecoder<Iec101Frame>
         return new Iec101InterrogationCommandValue(asduType, ByteArrayUtil.unsignedByte(elementBytes[0]));
     }
 
+    private Iec101CounterInterrogationCommandValue parseCounterInterrogationCommandValue(Iec101AsduType asduType,
+                                                                                         byte[] elementBytes) {
+        if (elementBytes.length < 1) {
+            return null;
+        }
+        return new Iec101CounterInterrogationCommandValue(asduType, ByteArrayUtil.unsignedByte(elementBytes[0]));
+    }
+
+    private Iec101ReadCommandValue parseReadCommandValue(Iec101AsduType asduType) {
+        return new Iec101ReadCommandValue(asduType);
+    }
+
     private Iec101ClockSynchronizationCommandValue parseClockSynchronizationCommandValue(Iec101AsduType asduType,
                                                                                          byte[] elementBytes) {
         if (elementBytes.length < Iec101Cp56Time2a.LENGTH) {
             return null;
         }
         return new Iec101ClockSynchronizationCommandValue(asduType, Iec101Cp56Time2a.parse(elementBytes, 0));
+    }
+
+    private Iec101ResetProcessCommandValue parseResetProcessCommandValue(Iec101AsduType asduType,
+                                                                         byte[] elementBytes) {
+        if (elementBytes.length < 1) {
+            return null;
+        }
+        return new Iec101ResetProcessCommandValue(asduType, ByteArrayUtil.unsignedByte(elementBytes[0]));
+    }
+
+    private Iec101DelayAcquisitionCommandValue parseDelayAcquisitionCommandValue(Iec101AsduType asduType,
+                                                                                 byte[] elementBytes) {
+        if (elementBytes.length < 2) {
+            return null;
+        }
+        return new Iec101DelayAcquisitionCommandValue(asduType, readUnsignedLittleEndian(elementBytes, 0, 2));
     }
 
     private Iec101TimeTag parseTimeTag(byte[] elementBytes, int offset, int length) {

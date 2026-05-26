@@ -19,7 +19,11 @@ public enum Iec101AsduType {
     C_SC_NA_1(45, "single command", 1),
     C_DC_NA_1(46, "double command", 1),
     C_IC_NA_1(100, "interrogation command", 1),
+    C_CI_NA_1(101, "counter interrogation command", 1),
+    C_RD_NA_1(102, "read command", 0),
     C_CS_NA_1(103, "clock synchronization command", 7),
+    C_RP_NA_1(105, "reset process command", 1),
+    C_CD_NA_1(106, "delay acquisition command", 2),
     UNKNOWN(-1, "unknown", -1);
 
     private final int typeId;
