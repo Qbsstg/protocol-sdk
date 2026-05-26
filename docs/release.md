@@ -5,7 +5,7 @@ Central Portal.
 
 ## Current Release Scope
 
-The first planned public release is `0.1.0` and should include:
+The first public release was `0.1.0` and included:
 
 - `io.github.qbsstg:protocol-sdk`
 - `io.github.qbsstg:protocol-core`
@@ -13,6 +13,12 @@ The first planned public release is `0.1.0` and should include:
 
 The parent POM is for building the SDK workspace. Applications should depend on
 protocol modules directly.
+
+The next completion target is `0.5.0`; its readiness decision is documented in
+[`release-readiness-0.5.0.md`](release-readiness-0.5.0.md). The selected
+`0.5.0` policy is to publish the current Maven reactor as one versioned release,
+including experimental `protocol-modbus`, while release notes and module docs
+keep Modbus clearly marked as experimental and non-blocking.
 
 ## Prerequisites
 
@@ -112,14 +118,16 @@ scope, tag policy, and rollback expectations are settled.
 ## Release Checklist
 
 1. Confirm `main` is clean and CI is green.
-2. Update versions from `0.1.0-SNAPSHOT` to the release version.
-3. Run `mvn -q verify`.
-4. Run the signed dry run.
-5. Tag the release commit.
-6. Run the manual publishing command.
-7. Review and publish the validated deployment in the Central Portal.
-8. Create the GitHub release notes.
-9. Move versions to the next `-SNAPSHOT`.
+2. Confirm the release-readiness note for the target version is current.
+3. Update versions from the current `-SNAPSHOT` version to the release version.
+4. Confirm README and module docs label experimental modules accurately.
+5. Run `mvn -q verify`.
+6. Run the signed dry run.
+7. Tag the release commit.
+8. Run the manual publishing command.
+9. Review and publish the validated deployment in the Central Portal.
+10. Create the GitHub release notes.
+11. Move versions to the next `-SNAPSHOT`.
 
 ## References
 

@@ -4,6 +4,10 @@
 Java 8 compatible and runtime-independent: no socket client, scheduler, Netty,
 Spring, database, Redis, or message-queue dependency is included.
 
+This module remains experimental for `0.5.0`. It may be published with the
+reactor version, but Modbus stable completion is a next-phase goal and does not
+block the IEC101/IEC103-focused `0.5.0` release.
+
 ## TCP Usage
 
 The TCP decoder is stream-oriented and buffers incomplete ADUs internally.
