@@ -111,7 +111,9 @@ public class Iec101AsduValueTest {
     public void classifiesAsduSupport() {
         assertTrue(Iec101AsduSupport.ofTypeId(1).hasTypedValue());
         assertEquals(Iec101SinglePointValue.class, Iec101AsduSupport.ofTypeId(1).getValueClass());
-        assertTrue(Iec101AsduSupport.ofTypeId(103).isRawBytesOnly());
+        assertEquals(Iec101SinglePointValue.class, Iec101AsduSupport.ofTypeId(2).getValueClass());
+        assertEquals(Iec101ClockSynchronizationCommandValue.class,
+                Iec101AsduSupport.ofTypeId(103).getValueClass());
         assertTrue(Iec101AsduSupport.ofTypeId(200).isUnknownType());
     }
 
