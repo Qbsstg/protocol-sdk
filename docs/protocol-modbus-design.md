@@ -15,6 +15,9 @@ registry concerns.
 The parser must preserve raw bytes at every layer because Modbus deployments
 often include vendor-specific function codes and non-standard payloads.
 
+The public API usage guide is maintained in
+[`protocol-modbus/docs/api-usage.md`](../protocol-modbus/docs/api-usage.md).
+
 ## Public Model
 
 The module should expose these core types:
