@@ -72,5 +72,14 @@ The first baseline returns typed values for:
 Unknown Type IDs and raw-only Type IDs still preserve raw ASDU and information
 element bytes for diagnostics and vendor-specific handling.
 
+Measured values expose both the signed 16-bit raw value and the normalized
+`rawValue / 32768.0d` value. The measured-value quality/status byte is
+available as a raw unsigned byte through `Iec103MeasuredValue.getQuality()`.
+
+Identification values expose the variable-length payload bytes through
+`Iec103IdentificationValue.getRawBytes()` and a US-ASCII projection through
+`getAsciiText()`. The surrounding `Iec103InformationElement` still exposes the
+full `FUN`/`INF` plus payload bytes.
+
 For the detailed typed, raw-only, unknown, and deferred coverage audit, see
 [`asdu-support-matrix.md`](asdu-support-matrix.md).
