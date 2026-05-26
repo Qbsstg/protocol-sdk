@@ -187,12 +187,16 @@ ASDU support:
   - `C_SC_NA_1` single command.
   - `C_DC_NA_1` double command.
   - `C_IC_NA_1` interrogation command.
-- Raw-only first set:
-  - `C_CS_NA_1` clock synchronization command, until IEC101-named timestamp
-    models are introduced.
 
-Time-tagged process values with CP24Time2a or CP56Time2a should be a follow-up
-slice, because they need explicit IEC101-named timestamp models.
+Follow-up time-tagged support adds IEC101-named timestamp models:
+
+- `Iec101Cp24Time2a` for selected CP24 process-value variants.
+- `Iec101Cp56Time2a` for selected CP56 process-value variants and
+  `C_CS_NA_1` clock synchronization.
+
+Step position, bitstring, integrated totals, protection events, and
+time-tagged command variants remain deferred until their base public models are
+added or real integration demand justifies the API.
 
 ## Test Strategy
 

@@ -47,7 +47,11 @@ ASDU support:
   address lengths.
 - Typed first set: `M_SP_NA_1`, `M_DP_NA_1`, `M_ME_NA_1`, `M_ME_NB_1`,
   `M_ME_NC_1`, `C_SC_NA_1`, `C_DC_NA_1`, and `C_IC_NA_1`.
-- Raw-byte fallback for unknown Type IDs and raw-only `C_CS_NA_1`.
+- Selected time-tagged process values: `M_SP_TA_1`, `M_DP_TA_1`,
+  `M_ME_TA_1`, `M_ME_TB_1`, `M_ME_TC_1`, `M_SP_TB_1`, `M_DP_TB_1`,
+  `M_ME_TD_1`, `M_ME_TE_1`, and `M_ME_TF_1`.
+- `C_CS_NA_1` clock synchronization with `Iec101Cp56Time2a`.
+- Raw-byte fallback for unknown Type IDs.
 
 The detailed support matrix and `0.5.0` completion audit are maintained in
 [`docs/asdu-support-matrix.md`](docs/asdu-support-matrix.md).

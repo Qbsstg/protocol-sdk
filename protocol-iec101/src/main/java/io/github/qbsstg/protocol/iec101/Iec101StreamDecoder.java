@@ -243,67 +243,97 @@ public final class Iec101StreamDecoder implements ByteStreamDecoder<Iec101Frame>
     private Iec101InformationValue parseInformationValue(Iec101AsduType asduType, byte[] elementBytes) {
         switch (asduType) {
             case M_SP_NA_1:
-                return parseSinglePointValue(asduType, elementBytes);
+                return parseSinglePointValue(asduType, elementBytes, 0);
+            case M_SP_TA_1:
+                return parseSinglePointValue(asduType, elementBytes, Iec101Cp24Time2a.LENGTH);
+            case M_SP_TB_1:
+                return parseSinglePointValue(asduType, elementBytes, Iec101Cp56Time2a.LENGTH);
             case M_DP_NA_1:
-                return parseDoublePointValue(asduType, elementBytes);
+                return parseDoublePointValue(asduType, elementBytes, 0);
+            case M_DP_TA_1:
+                return parseDoublePointValue(asduType, elementBytes, Iec101Cp24Time2a.LENGTH);
+            case M_DP_TB_1:
+                return parseDoublePointValue(asduType, elementBytes, Iec101Cp56Time2a.LENGTH);
             case M_ME_NA_1:
-                return parseNormalizedMeasuredValue(asduType, elementBytes);
+                return parseNormalizedMeasuredValue(asduType, elementBytes, 0);
+            case M_ME_TA_1:
+                return parseNormalizedMeasuredValue(asduType, elementBytes, Iec101Cp24Time2a.LENGTH);
+            case M_ME_TD_1:
+                return parseNormalizedMeasuredValue(asduType, elementBytes, Iec101Cp56Time2a.LENGTH);
             case M_ME_NB_1:
-                return parseScaledMeasuredValue(asduType, elementBytes);
+                return parseScaledMeasuredValue(asduType, elementBytes, 0);
+            case M_ME_TB_1:
+                return parseScaledMeasuredValue(asduType, elementBytes, Iec101Cp24Time2a.LENGTH);
+            case M_ME_TE_1:
+                return parseScaledMeasuredValue(asduType, elementBytes, Iec101Cp56Time2a.LENGTH);
             case M_ME_NC_1:
-                return parseShortFloatMeasuredValue(asduType, elementBytes);
+                return parseShortFloatMeasuredValue(asduType, elementBytes, 0);
+            case M_ME_TC_1:
+                return parseShortFloatMeasuredValue(asduType, elementBytes, Iec101Cp24Time2a.LENGTH);
+            case M_ME_TF_1:
+                return parseShortFloatMeasuredValue(asduType, elementBytes, Iec101Cp56Time2a.LENGTH);
             case C_SC_NA_1:
                 return parseSingleCommandValue(asduType, elementBytes);
             case C_DC_NA_1:
                 return parseDoubleCommandValue(asduType, elementBytes);
             case C_IC_NA_1:
                 return parseInterrogationCommandValue(asduType, elementBytes);
+            case C_CS_NA_1:
+                return parseClockSynchronizationCommandValue(asduType, elementBytes);
             default:
                 return null;
         }
     }
 
-    private Iec101SinglePointValue parseSinglePointValue(Iec101AsduType asduType, byte[] elementBytes) {
-        if (elementBytes.length < 1) {
+    private Iec101SinglePointValue parseSinglePointValue(Iec101AsduType asduType, byte[] elementBytes,
+                                                         int timeTagLength) {
+        if (elementBytes.length < 1 + timeTagLength) {
             return null;
         }
         int rawValue = ByteArrayUtil.unsignedByte(elementBytes[0]);
         return new Iec101SinglePointValue(asduType, (rawValue & 0x01) != 0,
-                Iec101QualityDescriptor.status(rawValue));
+                Iec101QualityDescriptor.status(rawValue), parseTimeTag(elementBytes, 1, timeTagLength));
     }
 
-    private Iec101DoublePointValue parseDoublePointValue(Iec101AsduType asduType, byte[] elementBytes) {
-        if (elementBytes.length < 1) {
+    private Iec101DoublePointValue parseDoublePointValue(Iec101AsduType asduType, byte[] elementBytes,
+                                                         int timeTagLength) {
+        if (elementBytes.length < 1 + timeTagLength) {
             return null;
         }
         int rawValue = ByteArrayUtil.unsignedByte(elementBytes[0]);
         return new Iec101DoublePointValue(asduType, Iec101DoublePointState.fromCode(rawValue),
-                Iec101QualityDescriptor.status(rawValue));
+                Iec101QualityDescriptor.status(rawValue), parseTimeTag(elementBytes, 1, timeTagLength));
     }
 
-    private Iec101MeasuredValue parseNormalizedMeasuredValue(Iec101AsduType asduType, byte[] elementBytes) {
-        if (elementBytes.length < 3) {
+    private Iec101MeasuredValue parseNormalizedMeasuredValue(Iec101AsduType asduType, byte[] elementBytes,
+                                                             int timeTagLength) {
+        if (elementBytes.length < 3 + timeTagLength) {
             return null;
         }
         return Iec101MeasuredValue.normalized(asduType, readSignedLittleEndian16(elementBytes, 0),
-                Iec101QualityDescriptor.measurement(ByteArrayUtil.unsignedByte(elementBytes[2])));
+                Iec101QualityDescriptor.measurement(ByteArrayUtil.unsignedByte(elementBytes[2])),
+                parseTimeTag(elementBytes, 3, timeTagLength));
     }
 
-    private Iec101MeasuredValue parseScaledMeasuredValue(Iec101AsduType asduType, byte[] elementBytes) {
-        if (elementBytes.length < 3) {
+    private Iec101MeasuredValue parseScaledMeasuredValue(Iec101AsduType asduType, byte[] elementBytes,
+                                                         int timeTagLength) {
+        if (elementBytes.length < 3 + timeTagLength) {
             return null;
         }
         return Iec101MeasuredValue.scaled(asduType, readSignedLittleEndian16(elementBytes, 0),
-                Iec101QualityDescriptor.measurement(ByteArrayUtil.unsignedByte(elementBytes[2])));
+                Iec101QualityDescriptor.measurement(ByteArrayUtil.unsignedByte(elementBytes[2])),
+                parseTimeTag(elementBytes, 3, timeTagLength));
     }
 
-    private Iec101MeasuredValue parseShortFloatMeasuredValue(Iec101AsduType asduType, byte[] elementBytes) {
-        if (elementBytes.length < 5) {
+    private Iec101MeasuredValue parseShortFloatMeasuredValue(Iec101AsduType asduType, byte[] elementBytes,
+                                                             int timeTagLength) {
+        if (elementBytes.length < 5 + timeTagLength) {
             return null;
         }
         int rawBits = readUnsignedLittleEndian(elementBytes, 0, 4);
         return Iec101MeasuredValue.shortFloat(asduType, Float.intBitsToFloat(rawBits), rawBits,
-                Iec101QualityDescriptor.measurement(ByteArrayUtil.unsignedByte(elementBytes[4])));
+                Iec101QualityDescriptor.measurement(ByteArrayUtil.unsignedByte(elementBytes[4])),
+                parseTimeTag(elementBytes, 5, timeTagLength));
     }
 
     private Iec101SingleCommandValue parseSingleCommandValue(Iec101AsduType asduType, byte[] elementBytes) {
@@ -330,6 +360,24 @@ public final class Iec101StreamDecoder implements ByteStreamDecoder<Iec101Frame>
             return null;
         }
         return new Iec101InterrogationCommandValue(asduType, ByteArrayUtil.unsignedByte(elementBytes[0]));
+    }
+
+    private Iec101ClockSynchronizationCommandValue parseClockSynchronizationCommandValue(Iec101AsduType asduType,
+                                                                                         byte[] elementBytes) {
+        if (elementBytes.length < Iec101Cp56Time2a.LENGTH) {
+            return null;
+        }
+        return new Iec101ClockSynchronizationCommandValue(asduType, Iec101Cp56Time2a.parse(elementBytes, 0));
+    }
+
+    private Iec101TimeTag parseTimeTag(byte[] elementBytes, int offset, int length) {
+        if (length == 0) {
+            return null;
+        }
+        if (length == Iec101Cp24Time2a.LENGTH) {
+            return Iec101Cp24Time2a.parse(elementBytes, offset);
+        }
+        return Iec101Cp56Time2a.parse(elementBytes, offset);
     }
 
     private int findStart(byte[] bytes, int from) {

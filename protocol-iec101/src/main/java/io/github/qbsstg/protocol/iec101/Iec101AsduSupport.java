@@ -26,12 +26,22 @@ public final class Iec101AsduSupport {
 
         switch (asduType) {
             case M_SP_NA_1:
+            case M_SP_TA_1:
+            case M_SP_TB_1:
                 return typed(asduType, Iec101SinglePointValue.class);
             case M_DP_NA_1:
+            case M_DP_TA_1:
+            case M_DP_TB_1:
                 return typed(asduType, Iec101DoublePointValue.class);
             case M_ME_NA_1:
+            case M_ME_TA_1:
             case M_ME_NB_1:
+            case M_ME_TB_1:
             case M_ME_NC_1:
+            case M_ME_TC_1:
+            case M_ME_TD_1:
+            case M_ME_TE_1:
+            case M_ME_TF_1:
                 return typed(asduType, Iec101MeasuredValue.class);
             case C_SC_NA_1:
                 return typed(asduType, Iec101SingleCommandValue.class);
@@ -40,7 +50,7 @@ public final class Iec101AsduSupport {
             case C_IC_NA_1:
                 return typed(asduType, Iec101InterrogationCommandValue.class);
             case C_CS_NA_1:
-                return rawBytesOnly(asduType);
+                return typed(asduType, Iec101ClockSynchronizationCommandValue.class);
             case UNKNOWN:
             default:
                 return unknown();
