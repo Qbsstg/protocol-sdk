@@ -187,6 +187,10 @@ ASDU support:
   - `C_SC_NA_1` single command.
   - `C_DC_NA_1` double command.
   - `C_IC_NA_1` interrogation command.
+  - `C_CI_NA_1` counter interrogation command.
+  - `C_RD_NA_1` read command.
+  - `C_RP_NA_1` reset process command.
+  - `C_CD_NA_1` delay acquisition command.
 
 Follow-up time-tagged support adds IEC101-named timestamp models:
 
@@ -195,8 +199,9 @@ Follow-up time-tagged support adds IEC101-named timestamp models:
   `C_CS_NA_1` clock synchronization.
 
 Step position, bitstring, integrated totals, protection events, and
-time-tagged command variants remain deferred until their base public models are
-added or real integration demand justifies the API.
+regulating step, set point, bitstring command, and time-tagged command variants
+remain deferred until their base public models are added or real integration
+demand justifies the API.
 
 ## Test Strategy
 

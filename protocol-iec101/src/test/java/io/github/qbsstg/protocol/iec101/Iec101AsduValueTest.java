@@ -112,6 +112,8 @@ public class Iec101AsduValueTest {
         assertTrue(Iec101AsduSupport.ofTypeId(1).hasTypedValue());
         assertEquals(Iec101SinglePointValue.class, Iec101AsduSupport.ofTypeId(1).getValueClass());
         assertEquals(Iec101SinglePointValue.class, Iec101AsduSupport.ofTypeId(2).getValueClass());
+        assertEquals(Iec101CounterInterrogationCommandValue.class,
+                Iec101AsduSupport.ofTypeId(101).getValueClass());
         assertEquals(Iec101ClockSynchronizationCommandValue.class,
                 Iec101AsduSupport.ofTypeId(103).getValueClass());
         assertTrue(Iec101AsduSupport.ofTypeId(200).isUnknownType());

@@ -50,7 +50,8 @@ ASDU support:
 - Selected time-tagged process values: `M_SP_TA_1`, `M_DP_TA_1`,
   `M_ME_TA_1`, `M_ME_TB_1`, `M_ME_TC_1`, `M_SP_TB_1`, `M_DP_TB_1`,
   `M_ME_TD_1`, `M_ME_TE_1`, and `M_ME_TF_1`.
-- `C_CS_NA_1` clock synchronization with `Iec101Cp56Time2a`.
+- Station-service commands: `C_CI_NA_1`, `C_RD_NA_1`, `C_CS_NA_1`,
+  `C_RP_NA_1`, and `C_CD_NA_1`.
 - Raw-byte fallback for unknown Type IDs.
 
 The detailed support matrix and `0.5.0` completion audit are maintained in
