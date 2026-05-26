@@ -71,3 +71,6 @@ The first baseline returns typed values for:
 
 Unknown Type IDs and raw-only Type IDs still preserve raw ASDU and information
 element bytes for diagnostics and vendor-specific handling.
+
+For the detailed typed, raw-only, unknown, and deferred coverage audit, see
+[`asdu-support-matrix.md`](asdu-support-matrix.md).
