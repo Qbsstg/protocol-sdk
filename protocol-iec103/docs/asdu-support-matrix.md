@@ -73,7 +73,7 @@ caller explicitly wants unknown payload bytes suppressed at the element level.
 | --- | --- | --- |
 | FT1.2 frame parsing covers common relay links | Covered for single-character, fixed-length, and variable-length frames with checksum validation, buffering, concatenation, max-frame limits, and recovery fixtures. | Add more real relay traces when available. |
 | ASDU header exposes Type ID, VSQ, COT, common address, `FUN`, and `INF` | Covered by public `Iec103Asdu` and `Iec103InformationElement` APIs. | Add more cause/common-address fixtures if devices require two-octet common addresses. |
-| Protection event values cover time-tagged and relative-time payloads | Type IDs `1` and `2` return typed `Iec103ProtectionEventValue` with quality, relative time, fault number, and time-tag metadata where present. | Expand quality boundary fixtures and real relay event catalog coverage. |
+| Protection event values cover time-tagged and relative-time payloads | Type IDs `1` and `2` return typed `Iec103ProtectionEventValue` with quality, event state, relative time, fault number, time-tag metadata, and malformed/truncated payload fixtures. | Add real relay event catalog coverage when device traces are available. |
 | Measurands I and II have typed value tests and documented conversion rules | Type IDs `3` and `9` return `Iec103MeasuredValue`; tests cover positive and negative normalized values. | Add more quality/status interpretation and engineering-unit guidance. |
 | Identification payloads preserve raw bytes and expose stable public fields | Type ID `5` returns `Iec103IdentificationValue` with defensive raw bytes and ASCII projection. | Add vendor-specific identification fixtures only where fields are stable. |
 | Generic data, disturbance records, and vendor-specific Type IDs are classified | Current behavior is unknown/raw-preserved; Type ID `4` is recognized raw-only. | Add explicit raw-only constants for generic and disturbance categories before any typed model claims. |
@@ -81,7 +81,7 @@ caller explicitly wants unknown payload bytes suppressed at the element level.
 
 ## Fixture Gaps
 
-- More protection event quality boundary cases.
+- Additional real-device protection event catalogs.
 - Time-tagged measurands with relative time, currently raw-only Type ID `4`.
 - Two-octet common-address fixtures if a target relay requires them.
 - Generic data and generic identification raw-only catalog entries.
