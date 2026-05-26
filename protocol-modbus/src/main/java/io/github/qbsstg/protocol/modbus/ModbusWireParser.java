@@ -66,8 +66,7 @@ final class ModbusWireParser {
             case 0x10:
                 return parseWriteMultipleRegisters(functionCode, pduBytes);
             case 0x17:
-                return PduParse.success(new ModbusPdu(functionCode,
-                        new ModbusRawValue(ByteArrayUtil.copyOfRange(pduBytes, 1, pduBytes.length)), pduBytes));
+                return parseReadWriteMultipleRegisters(functionCode, pduBytes);
             default:
                 return PduParse.success(new ModbusPdu(functionCode,
                         new ModbusRawValue(ByteArrayUtil.copyOfRange(pduBytes, 1, pduBytes.length)), pduBytes));
@@ -176,6 +175,46 @@ final class ModbusWireParser {
                 new ModbusWriteMultipleRegistersValue(new ModbusAddressRange(startAddress, quantity),
                         byteCount, unpackRegisters(rawData), rawData),
                 pduBytes));
+    }
+
+    private static PduParse parseReadWriteMultipleRegisters(int functionCode, byte[] pduBytes) {
+        if (pduBytes.length >= 10) {
+            int byteCount = ByteArrayUtil.unsignedByte(pduBytes[9]);
+            int writeQuantity = readUnsignedShort(pduBytes, 7);
+            if (byteCount > 0 && pduBytes.length == 10 + byteCount) {
+                if ((byteCount & 0x01) != 0) {
+                    return PduParse.error("Invalid Modbus read/write multiple registers byte count: " + byteCount);
+                }
+                if (byteCount != writeQuantity * 2) {
+                    return PduParse.error("Invalid Modbus read/write multiple registers byte count: " + byteCount);
+                }
+                byte[] rawData = ByteArrayUtil.copyOfRange(pduBytes, 10, pduBytes.length);
+                return PduParse.success(new ModbusPdu(functionCode,
+                        new ModbusReadWriteMultipleRegistersValue(
+                                new ModbusAddressRange(readUnsignedShort(pduBytes, 1),
+                                        readUnsignedShort(pduBytes, 3)),
+                                new ModbusAddressRange(readUnsignedShort(pduBytes, 5),
+                                        writeQuantity),
+                                byteCount, unpackRegisters(rawData), rawData),
+                        pduBytes));
+            }
+        }
+        if (pduBytes.length < 2) {
+            return PduParse.error("Invalid Modbus read/write multiple registers response length: "
+                    + pduBytes.length);
+        }
+        int byteCount = ByteArrayUtil.unsignedByte(pduBytes[1]);
+        if (pduBytes.length != 2 + byteCount) {
+            return PduParse.error("Invalid Modbus read/write multiple registers response byte count: "
+                    + byteCount);
+        }
+        if ((byteCount & 0x01) != 0) {
+            return PduParse.error("Invalid Modbus read/write multiple registers response byte count: "
+                    + byteCount);
+        }
+        byte[] rawData = ByteArrayUtil.copyOfRange(pduBytes, 2, pduBytes.length);
+        return PduParse.success(new ModbusPdu(functionCode,
+                new ModbusRegisterValues(byteCount, unpackRegisters(rawData), rawData), pduBytes));
     }
 
     private static boolean[] unpackBits(byte[] rawData, int count) {

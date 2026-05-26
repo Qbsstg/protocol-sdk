@@ -82,16 +82,70 @@ public class ModbusPduValueTest {
     }
 
     @Test
-    public void marksReadWriteMultipleRegistersAsRawOnly() {
+    public void decodesReadWriteMultipleRegistersRequest() {
         ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
 
         ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
-                0x00, 0x06, 0x00, 0x00, 0x00, 0x03,
-                0x11, 0x17, 0x00));
+                0x00, 0x06, 0x00, 0x00, 0x00, 0x0F,
+                0x11, 0x17,
+                0x00, 0x01, 0x00, 0x02,
+                0x00, 0x10, 0x00, 0x02,
+                0x04, 0x00, 0x0A, 0x01, 0x02));
 
         assertTrue(result.isSuccess());
-        assertEquals(ModbusSupportStatus.RAW_ONLY, result.getFrame().getPdu().getSupport().getStatus());
-        assertTrue(result.getFrame().getPdu().getValue() instanceof ModbusRawValue);
+        assertEquals(ModbusSupportStatus.TYPED, result.getFrame().getPdu().getSupport().getStatus());
+
+        ModbusReadWriteMultipleRegistersValue value =
+                (ModbusReadWriteMultipleRegistersValue) result.getFrame().getPdu().getValue();
+        assertEquals(0x0001, value.getReadRange().getStartAddress());
+        assertEquals(2, value.getReadRange().getQuantity());
+        assertEquals(0x0010, value.getWriteRange().getStartAddress());
+        assertEquals(2, value.getWriteRange().getQuantity());
+        assertEquals(4, value.getByteCount());
+        assertArrayEquals(new int[]{10, 258}, value.getValues());
+    }
+
+    @Test
+    public void decodesReadWriteMultipleRegistersResponse() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x07, 0x00, 0x00, 0x00, 0x07,
+                0x11, 0x17, 0x04, 0x00, 0x0A, 0x01, 0x02));
+
+        assertTrue(result.isSuccess());
+        assertEquals(ModbusSupportStatus.TYPED, result.getFrame().getPdu().getSupport().getStatus());
+
+        ModbusRegisterValues value = (ModbusRegisterValues) result.getFrame().getPdu().getValue();
+        assertEquals(4, value.getByteCount());
+        assertArrayEquals(new int[]{10, 258}, value.getValues());
+    }
+
+    @Test
+    public void rejectsReadWriteMultipleRegistersOddRequestByteCount() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x08, 0x00, 0x00, 0x00, 0x0E,
+                0x11, 0x17,
+                0x00, 0x01, 0x00, 0x02,
+                0x00, 0x10, 0x00, 0x02,
+                0x03, 0x00, 0x0A, 0x01));
+
+        assertTrue(result.isError());
+        assertTrue(result.getMessage().contains("read/write multiple registers byte count"));
+    }
+
+    @Test
+    public void rejectsReadWriteMultipleRegistersOddResponseByteCount() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x09, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x17, 0x03, 0x00, 0x0A, 0x01));
+
+        assertTrue(result.isError());
+        assertTrue(result.getMessage().contains("read/write multiple registers response byte count"));
     }
 
     private static byte[] bytes(int... values) {

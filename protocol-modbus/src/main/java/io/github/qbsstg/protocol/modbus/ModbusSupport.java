@@ -18,9 +18,6 @@ public final class ModbusSupport {
         if (known == null) {
             return new ModbusSupport(normalized, null, ModbusSupportStatus.UNKNOWN);
         }
-        if (known == ModbusFunctionCode.READ_WRITE_MULTIPLE_REGISTERS) {
-            return new ModbusSupport(normalized, known, ModbusSupportStatus.RAW_ONLY);
-        }
         return new ModbusSupport(normalized, known, ModbusSupportStatus.TYPED);
     }
 
