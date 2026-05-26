@@ -118,9 +118,13 @@ Before the actual `0.5.0` release, choose one policy:
 | Publish all modules with clear experimental labels | Simpler Maven release; Modbus artifact exists at `0.5.0` but docs say it is experimental. |
 | Exclude experimental modules from publishing | Cleaner external signal, but requires Maven release profile work and more release complexity. |
 
-The pragmatic default is to publish all modules and mark Modbus experimental in
-README, module docs, and release notes. If that feels misleading later, add a
-release profile that skips experimental modules before tagging `0.5.0`.
+The selected `0.5.0` readiness policy is to publish all current reactor modules
+and mark Modbus experimental in README, module docs, and release notes. This
+keeps the Maven release simple and makes Modbus available for early adopters
+without turning it into a `0.5.0` stability gate.
+
+If that feels misleading later, add a release profile that skips experimental
+modules before tagging a future release.
 
 ## Runtime Relationship
 

@@ -3,6 +3,10 @@
 `protocol-iec103` is the IEC 60870-5-103 parser module. It is Java 8
 compatible and depends only on `protocol-core` at runtime.
 
+This module is a `0.5.0` completion candidate: its documented relay-frame,
+protection event, measurand, identification, and raw-fallback scope is intended
+for the next SDK completion release.
+
 ## Usage
 
 ```java

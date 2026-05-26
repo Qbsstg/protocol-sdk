@@ -3,6 +3,10 @@
 `protocol-iec101` is the IEC 60870-5-101 parser module. It is Java 8
 compatible and depends only on `protocol-core` at runtime.
 
+This module is a `0.5.0` completion candidate: its documented frame and ASDU
+scope is intended for the next SDK completion release, while unsupported Type
+IDs continue to preserve raw bytes for diagnostics.
+
 ## Usage
 
 ```java
