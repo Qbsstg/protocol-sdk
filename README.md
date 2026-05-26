@@ -4,14 +4,14 @@ Protocol SDK is a standalone Java protocol parsing SDK. It is split from a
 legacy collector runtime and intentionally keeps only protocol parsing,
 streaming decoders, and strongly typed protocol models.
 
-The first published module is IEC 60870-5-104. The SDK does not depend on
-Spring, Netty, databases, Redis, message queues, or collector runtime globals.
+The first public baseline started with IEC 60870-5-104, and the current
+published SDK line also includes IEC101, IEC103, and experimental Modbus
+modules. The SDK does not depend on Spring, Netty, databases, Redis, message
+queues, or collector runtime globals.
 
 ## Maven Central
 
-Release candidate: `0.5.0`
-
-Previous stable release: `0.1.0`
+Current stable release: `0.5.0`
 
 Use the protocol module directly in applications:
 
@@ -98,13 +98,14 @@ and the
 | --- | --- | --- |
 | `protocol-core` | Published | Shared Java 8 compatible parser contracts and result types. |
 | `protocol-iec104` | Published | IEC 60870-5-104 APDU, ASDU, information object, and typed value parser. |
-| `protocol-iec101` | `0.5.0` candidate | IEC 60870-5-101 FT1.2 frame parser and practical ASDU completion target. [Support matrix](protocol-iec101/docs/asdu-support-matrix.md). |
-| `protocol-iec103` | `0.5.0` candidate | IEC 60870-5-103 FT1.2 frame parser with protection event, measurand, identification, and raw fallback completion target. [Support matrix](protocol-iec103/docs/asdu-support-matrix.md), [Design note](docs/iec103-module-design.md), [Usage](protocol-iec103/docs/api-usage.md). |
-| `protocol-modbus` | Experimental | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. [Design note](docs/protocol-modbus-design.md). |
+| `protocol-iec101` | Published | IEC 60870-5-101 FT1.2 frame parser and practical ASDU completion target. [Support matrix](protocol-iec101/docs/asdu-support-matrix.md). |
+| `protocol-iec103` | Published | IEC 60870-5-103 FT1.2 frame parser with protection event, measurand, identification, and raw fallback completion target. [Support matrix](protocol-iec103/docs/asdu-support-matrix.md), [Design note](docs/iec103-module-design.md), [Usage](protocol-iec103/docs/api-usage.md). |
+| `protocol-modbus` | Experimental, `0.6.0` target | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. [Design note](docs/protocol-modbus-design.md), [0.6.0 plan](docs/release-plan-0.6.0.md). |
 | `protocol-http` | Planned | HTTP protocol helpers for collection scenarios. |
 
-`0.5.0` candidate means the module is part of the IEC101/IEC103 completion
-release scope. Modbus remains experimental in this release.
+`0.6.0` is planned as the Modbus stable-completion release. Modbus remains
+experimental until the `0.6.0` gates in
+[`docs/release-plan-0.6.0.md`](docs/release-plan-0.6.0.md) are complete.
 
 ## IEC104 Coverage
 
@@ -154,8 +155,7 @@ recognized information objects are returned as `ParseResult.error()` entries.
 - Source compatibility target: Java 8.
 - Release builds can run on JDK 21 with `--release 8`.
 - CI verifies the project on JDK 8 and JDK 21.
-- The current release candidate version is `0.5.0`; `0.1.0` remains the
-  previous stable Maven Central release.
+- The current stable Maven Central release is `0.5.0`.
 
 ## Build
 
@@ -196,13 +196,12 @@ and the ingestion adapter roadmap is documented in
 ## Roadmap
 
 - Complete an IEC104 conformance and gap audit before adding more IEC104 types.
-- Focus the next SDK release phase on IEC101 and IEC103 completion. The SDK
-  release plan is tracked in [`docs/sdk-release-roadmap.md`](docs/sdk-release-roadmap.md).
+- Focus the next SDK release phase on Modbus TCP/UDP stable completion. The SDK
+  release plan is tracked in [`docs/sdk-release-roadmap.md`](docs/sdk-release-roadmap.md)
+  and [`docs/release-plan-0.6.0.md`](docs/release-plan-0.6.0.md).
 - The `0.5.0` readiness decision is tracked in
   [`docs/release-readiness-0.5.0.md`](docs/release-readiness-0.5.0.md).
-- Keep Modbus experimental until the next major SDK phase after IEC101 and
-  IEC103 are complete; it may be published with the reactor version but remains
-  a non-blocking module for `0.5.0`.
+- Keep Modbus experimental until the `0.6.0` stability gates are complete.
 - Build a future collector runtime on JDK 21 outside this SDK repository. The
   runtime architecture and ingestion roadmap are tracked in
   [`docs/runtime-platform-architecture.md`](docs/runtime-platform-architecture.md)
