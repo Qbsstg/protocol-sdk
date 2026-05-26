@@ -4,6 +4,8 @@ This note records the release-readiness decision for `0.5.0`. It is a
 pre-release checklist only; it does not publish artifacts and does not replace
 the signed Maven Central dry run required immediately before tagging.
 
+The release candidate branch sets the Maven reactor version to `0.5.0`.
+
 ## Release Scope
 
 `0.5.0` is the IEC101 and IEC103 completion target for this SDK line. The
@@ -97,13 +99,14 @@ That signed dry run must pass before any real Central upload.
 
 ## Audit Results On 2026-05-26
 
-These checks passed on the readiness branch:
+These checks passed on the release candidate branch:
 
 | Check | Result | Note |
 | --- | --- | --- |
 | `mvn -q verify` | Passed | Local Maven 3.9.9 runtime reported JDK 23.0.2; this exercises the JDK 9+ `--release 8` profile path locally. |
 | JDK 8 `mvn -q verify` | Passed | Used `/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home`. |
 | `mvn -q -Pcentral-release -Dgpg.skip=true -Dcentral.skipPublishing=true deploy` | Passed | Release profile smoke check only; no signing or publishing occurred. |
+| `mvn -Pcentral-release -Dcentral.skipPublishing=true clean deploy` | Passed | Signed dry run completed; Central publishing was skipped by configuration. |
 
 JDK 21 verification is enforced by GitHub Actions through the repository CI
 matrix. The release candidate PR must pass both `Test on JDK 8` and
@@ -111,14 +114,14 @@ matrix. The release candidate PR must pass both `Test on JDK 8` and
 
 ## Current Readiness Decision
 
-`0.5.0` can move to release preparation after this audit PR is merged, assuming
-the release candidate commit passes:
+`0.5.0` can move from release preparation to tagging and publishing after the
+release candidate commit passes:
 
 - local `mvn -q verify`;
 - local Java 8 `mvn -q verify`;
 - Central release profile smoke check with `central.skipPublishing=true`;
-- GitHub Actions JDK 8 and JDK 21 CI;
-- a final signed dry run before tagging.
+- signed dry run with `central.skipPublishing=true`;
+- GitHub Actions JDK 8 and JDK 21 CI.
 
 Modbus should not block `0.5.0`. If the project later decides not to publish
 experimental artifacts, add an explicit Maven release profile before tagging;

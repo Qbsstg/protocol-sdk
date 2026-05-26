@@ -20,6 +20,9 @@ The next completion target is `0.5.0`; its readiness decision is documented in
 including experimental `protocol-modbus`, while release notes and module docs
 keep Modbus clearly marked as experimental and non-blocking.
 
+The `0.5.0` release-note draft is maintained in
+[`release-notes-0.5.0.md`](release-notes-0.5.0.md).
+
 ## Prerequisites
 
 1. Verify the `io.github.qbsstg` namespace in the Central Portal.
@@ -126,7 +129,7 @@ scope, tag policy, and rollback expectations are settled.
 7. Tag the release commit.
 8. Run the manual publishing command.
 9. Review and publish the validated deployment in the Central Portal.
-10. Create the GitHub release notes.
+10. Publish the GitHub release notes from the target release-note draft.
 11. Move versions to the next `-SNAPSHOT`.
 
 ## References
