@@ -144,6 +144,9 @@ the most common process-data operations:
 Unsupported standard or vendor function codes should parse as raw-only PDUs
 when the ADU and PDU envelope is valid.
 
+The current implementation matrix is maintained in
+[`protocol-modbus/docs/function-support-matrix.md`](../protocol-modbus/docs/function-support-matrix.md).
+
 ## Typed Payload Shapes
 
 Read requests should use `ModbusAddressRange`:
@@ -201,4 +204,5 @@ Implementation requirements:
 3. Add typed payload parsing for function codes `0x01`, `0x02`, `0x03`,
    `0x04`, `0x05`, `0x06`, `0x0F`, and `0x10`.
 4. Add exception-response modeling for all function codes.
-5. Add support-matrix documentation similar to IEC104 once code exists.
+5. Add and maintain support-matrix documentation similar to IEC104 once code
+   exists.
