@@ -1,24 +1,21 @@
 # Protocol SDK 0.6.0 Release Notes
 
-`0.6.0` is planned as the Modbus stable-completion release for the Java 8
-compatible Protocol SDK line. The release keeps the SDK runtime-independent:
-parser modules do not depend on Spring, Netty, databases, Redis, MQTT, Kafka,
-HTTP server frameworks, schedulers, polling loops, retry policy, device
-registries, or collector runtime globals.
-
-This draft must be finalized on the `0.6.0` release candidate after the Modbus
-gate PRs have merged and CI has passed.
+`0.6.0` is the Modbus stable-completion release for the Java 8 compatible
+Protocol SDK line. The release keeps the SDK runtime-independent: parser
+modules do not depend on Spring, Netty, databases, Redis, MQTT, Kafka, HTTP
+server frameworks, schedulers, polling loops, retry policy, device registries,
+or collector runtime globals.
 
 ## Highlights
 
-- Promotes `protocol-modbus` from the `0.5.0` experimental baseline toward a
-  stable Modbus TCP and common Modbus-over-UDP parser module.
+- Promotes `protocol-modbus` from the `0.5.0` experimental baseline to a stable
+  Modbus TCP and common Modbus-over-UDP parser module.
 - Documents Modbus function-code support with typed, raw-only, unknown, and
   deferred behavior.
 - Adds usage guidance for TCP stream decoding, UDP datagram decoding,
   request/response correlation, exception responses, and raw fallback.
 - Promotes read/write multiple registers (`0x17`) from raw-only to typed
-  request and response parsing when the final gate PR is merged.
+  request and response parsing.
 - Hardens malformed MBAP/PDU behavior for TCP and UDP parser paths.
 - Adds standard quantity-limit, byte-count, register-byte-count, and coil-value
   validation coverage for typed Modbus function codes.
@@ -78,12 +75,11 @@ Most applications should not depend on the parent `protocol-sdk` POM directly.
 | `protocol-iec104` | Stable IEC104 parser surface, compatibility-maintained. |
 | `protocol-iec101` | Published IEC101 parser, compatibility-maintained after `0.5.0`. |
 | `protocol-iec103` | Published IEC103 parser, compatibility-maintained after `0.5.0`. |
-| `protocol-modbus` | `0.6.0` stable-completion target for practical Modbus TCP/UDP parser use. |
+| `protocol-modbus` | Stable parser module for practical Modbus TCP/UDP parser use. |
 
-`protocol-modbus` should be described as stable only after the release
-candidate includes the support matrix, usage guide, typed `0x17` work,
-malformed-frame fixtures, validation-limit coverage, model immutability tests,
-README status update, and final readiness audit.
+`protocol-modbus` is stable for the documented parser-only TCP/UDP MBAP ADU/PDU
+surface. It does not claim Modbus RTU/ASCII serial framing, socket clients,
+polling, request scheduling, telemetry storage, or runtime ingestion support.
 
 ## Modbus Scope
 
@@ -109,7 +105,7 @@ Out of scope:
 
 ## Function-Code Coverage
 
-The target typed coverage for `0.6.0` is:
+The typed coverage for `0.6.0` is:
 
 | Code | Name | Target support |
 | --- | --- | --- |
@@ -121,12 +117,12 @@ The target typed coverage for `0.6.0` is:
 | `0x06` | Write single register | Typed request and response echo. |
 | `0x0F` | Write multiple coils | Typed request and response. |
 | `0x10` | Write multiple registers | Typed request and response. |
-| `0x17` | Read/write multiple registers | Typed request and response after the gate PR merges. |
+| `0x17` | Read/write multiple registers | Typed request and response. |
 | `0x80`-style responses | Exception responses | Typed exception response with original function code and exception code. |
 | Unknown/vendor codes | Vendor-specific payloads | Raw fallback when the ADU/PDU envelope is valid. |
 
-The final release notes should be reconciled with the Modbus support matrix on
-the release candidate before publishing.
+The detailed support matrix is maintained in
+[`protocol-modbus/docs/function-support-matrix.md`](../protocol-modbus/docs/function-support-matrix.md).
 
 ## Verification
 
