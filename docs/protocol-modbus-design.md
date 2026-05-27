@@ -142,7 +142,7 @@ the most common process-data operations:
 | `0x06` | Write single register | Typed request and response echo |
 | `0x0F` | Write multiple coils | Typed request and response |
 | `0x10` | Write multiple registers | Typed request and response |
-| `0x17` | Read/write multiple registers | Raw-only in the first release |
+| `0x17` | Read/write multiple registers | Typed request and response |
 
 Unsupported standard or vendor function codes should parse as raw-only PDUs
 when the ADU and PDU envelope is valid.
@@ -172,6 +172,9 @@ Register responses should use `ModbusRegisterValues`:
 Write-single requests and responses should expose the echoed address and value.
 Write-multiple requests should expose address range plus bit/register payloads.
 Write-multiple responses should expose address range only.
+Read/write multiple-register requests should expose both the read range and
+write range plus the write register payload. Read/write multiple-register
+responses should expose the returned register payload.
 
 ## Validation Rules
 
