@@ -18,6 +18,7 @@ public class ModbusModelImmutabilityTest {
             ModbusParserConfig.class,
             ModbusPdu.class,
             ModbusRawValue.class,
+            ModbusReadWriteMultipleRegistersValue.class,
             ModbusRegisterValues.class,
             ModbusRequestResponseKey.class,
             ModbusSupport.class,
@@ -163,6 +164,26 @@ public class ModbusModelImmutabilityTest {
         exportedRegisterRawData[3] = 0x7F;
         assertArrayEquals(new int[]{10, 258}, registers.getValues());
         assertArrayEquals(bytes(0x00, 0x0A, 0x01, 0x02), registers.getRawData());
+    }
+
+    @Test
+    public void readWriteMultipleRegistersValueDefensivelyCopiesArrays() {
+        int[] registerValues = new int[]{10, 258};
+        byte[] registerRawData = bytes(0x00, 0x0A, 0x01, 0x02);
+        ModbusReadWriteMultipleRegistersValue value =
+                new ModbusReadWriteMultipleRegistersValue(new ModbusAddressRange(0x0001, 2),
+                        new ModbusAddressRange(0x0002, 2), 4, registerValues, registerRawData);
+        registerValues[0] = 99;
+        registerRawData[0] = 0x7F;
+
+        assertArrayEquals(new int[]{10, 258}, value.getValues());
+        assertArrayEquals(bytes(0x00, 0x0A, 0x01, 0x02), value.getRawData());
+        int[] exportedRegisters = value.getValues();
+        byte[] exportedRegisterRawData = value.getRawData();
+        exportedRegisters[1] = 99;
+        exportedRegisterRawData[3] = 0x7F;
+        assertArrayEquals(new int[]{10, 258}, value.getValues());
+        assertArrayEquals(bytes(0x00, 0x0A, 0x01, 0x02), value.getRawData());
     }
 
     private static byte[] bytes(int... values) {
