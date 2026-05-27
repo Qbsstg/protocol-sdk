@@ -38,6 +38,77 @@ public class ModbusDatagramDecoderTest {
     }
 
     @Test
+    public void rejectsInvalidProtocolId() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x01, 0x00, 0x01, 0x00, 0x06,
+                0x11, 0x03, 0x00, 0x6B, 0x00, 0x03));
+
+        assertTrue(result.isError());
+        assertTrue(result.getMessage().contains("Invalid Modbus protocol id"));
+    }
+
+    @Test
+    public void rejectsDeclaredLengthSmallerThanUnitAndFunction() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x11));
+
+        assertTrue(result.isError());
+        assertTrue(result.getMessage().contains("Invalid Modbus ADU length"));
+    }
+
+    @Test
+    public void reportsIncompleteWhenDeclaredLengthExceedsDatagram() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x01, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x03));
+
+        assertTrue(result.isIncomplete());
+    }
+
+    @Test
+    public void rejectsAduLengthAboveConfiguredMaximum() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder(
+                new ModbusParserConfig(true, 8, true));
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x01, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x03, 0x00, 0x6B, 0x00, 0x03));
+
+        assertTrue(result.isError());
+        assertTrue(result.getMessage().contains("Invalid Modbus ADU length"));
+    }
+
+    @Test
+    public void rejectsMalformedExceptionResponseLength() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x01, 0x00, 0x00, 0x00, 0x04,
+                0x11, 0x83, 0x02, 0x00));
+
+        assertTrue(result.isError());
+        assertTrue(result.getMessage().contains("exception response length"));
+    }
+
+    @Test
+    public void rejectsWriteMultipleRegistersOddByteCount() {
+        ModbusDatagramDecoder decoder = new ModbusDatagramDecoder();
+
+        ParseResult<ModbusTcpAdu> result = decoder.decode(bytes(
+                0x00, 0x01, 0x00, 0x00, 0x00, 0x0A,
+                0x11, 0x10, 0x00, 0x01, 0x00, 0x02, 0x03, 0x00, 0x0A, 0x01));
+
+        assertTrue(result.isError());
+        assertTrue(result.getMessage().contains("write multiple registers byte count"));
+    }
+
+    @Test
     public void allowsTrailingBytesWhenConfigured() {
         ModbusDatagramDecoder decoder = new ModbusDatagramDecoder(
                 new ModbusParserConfig(true, ModbusParserConfig.DEFAULT_MAX_ADU_LENGTH, false));

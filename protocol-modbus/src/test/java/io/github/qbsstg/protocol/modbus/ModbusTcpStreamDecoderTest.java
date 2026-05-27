@@ -141,6 +141,22 @@ public class ModbusTcpStreamDecoderTest {
     }
 
     @Test
+    public void returnsErrorForInvalidAduLengthAndRecovers() {
+        ModbusTcpStreamDecoder decoder = new ModbusTcpStreamDecoder();
+
+        List<ParseResult<ModbusTcpAdu>> results = decoder.decode(bytes(
+                0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x11,
+                0x00, 0x02, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x03, 0x00, 0x6B, 0x00, 0x03));
+
+        assertEquals(2, results.size());
+        assertTrue(results.get(0).isError());
+        assertTrue(results.get(0).getMessage().contains("Invalid Modbus ADU length"));
+        assertTrue(results.get(1).isSuccess());
+        assertEquals(2, results.get(1).getFrame().getTransactionId());
+    }
+
+    @Test
     public void returnsErrorForMalformedRegisterByteCount() {
         ModbusTcpStreamDecoder decoder = new ModbusTcpStreamDecoder();
 
@@ -151,6 +167,23 @@ public class ModbusTcpStreamDecoderTest {
         assertEquals(1, results.size());
         assertTrue(results.get(0).isError());
         assertTrue(results.get(0).getMessage().contains("byte count"));
+    }
+
+    @Test
+    public void returnsErrorForMalformedExceptionResponseAndRecovers() {
+        ModbusTcpStreamDecoder decoder = new ModbusTcpStreamDecoder();
+
+        List<ParseResult<ModbusTcpAdu>> results = decoder.decode(bytes(
+                0x00, 0x01, 0x00, 0x00, 0x00, 0x04,
+                0x11, 0x83, 0x02, 0x00,
+                0x00, 0x02, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x03, 0x00, 0x6B, 0x00, 0x03));
+
+        assertEquals(2, results.size());
+        assertTrue(results.get(0).isError());
+        assertTrue(results.get(0).getMessage().contains("exception response length"));
+        assertTrue(results.get(1).isSuccess());
+        assertEquals(2, results.get(1).getFrame().getTransactionId());
     }
 
     private static byte[] bytes(int... values) {
