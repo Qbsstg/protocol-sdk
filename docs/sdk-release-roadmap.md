@@ -1,15 +1,15 @@
 # SDK Release Roadmap
 
-This roadmap defines the next SDK release direction after the initial public
-`0.1.0` Maven Central release and the first parser baselines for IEC101,
-IEC103, and Modbus.
+This roadmap defines the SDK release direction after the published `0.5.0`
+Maven Central release and the first parser baselines for IEC101, IEC103, and
+Modbus.
 
 The working product decision is:
 
-- `0.5.0` focuses on completing IEC101 and IEC103 as practical SDK modules.
-- Modbus remains available as an experimental module before `0.5.0`, but it is
-  not a `0.5.0` completion gate.
-- Modbus stable completion moves to the next major SDK phase after `0.5.0`.
+- `0.5.0` completed IEC101 and IEC103 as practical SDK modules and published
+  Modbus as an experimental module.
+- `0.6.0` focuses on promoting Modbus TCP/UDP parsing from experimental to a
+  stable SDK module.
 - The future JDK 21 collector runtime remains separate from SDK releases.
 
 ## Version Intent
@@ -21,24 +21,27 @@ The working product decision is:
 | `0.3.0` | IEC101 hardening release. | Add fixtures, support matrix, malformed-frame behavior, time-tagged values, and usage docs. |
 | `0.4.0` | IEC103 hardening release. | Add protection relay fixtures, support matrix, relay event coverage, and clearer raw-only boundaries. |
 | `0.5.0` | IEC101 and IEC103 completion target. | Practical open-source SDK release for IEC101, IEC103, and existing IEC104 use cases. |
-| Next major phase | Modbus stable completion and broader runtime-facing integration polish. | Modbus becomes a release gate after IEC101/IEC103 are complete. |
+| `0.6.0` | Modbus stable completion. | Promote `protocol-modbus` from experimental to a stable TCP/UDP parser module after release gates pass. |
 
-`0.5.0` does not mean every standard corner case is complete. It means the SDK
-has a defensible, documented, tested, and stable-enough parser surface for the
-common IEC101 and IEC103 scenarios this project wants to support publicly.
+The `0.6.0` plan is tracked in
+[`release-plan-0.6.0.md`](release-plan-0.6.0.md).
+
+`0.6.0` should not mean every Modbus ecosystem corner case is complete. It
+means the SDK has a defensible, documented, tested, and stable-enough parser
+surface for common Modbus TCP and Modbus-over-UDP scenarios.
 
 ## Module Status Target
 
-| Module | Current status | `0.5.0` target |
+| Module | Current status | Next target |
 | --- | --- | --- |
 | `protocol-core` | Shared parser contracts. | Stable Java 8 API; no runtime dependencies. |
-| `protocol-iec104` | Published typed parser. | Maintain compatibility; only add fixes and documented gap closures needed by IEC101/IEC103 reuse decisions. |
-| `protocol-iec101` | Experimental FT1.2 and initial ASDU baseline. | Complete enough for common IEC101 link-frame and ASDU parsing scenarios. |
-| `protocol-iec103` | Experimental FT1.2 and protection relay baseline. | Complete enough for common protection relay event, measurand, identification, and raw fallback scenarios. |
-| `protocol-modbus` | Experimental TCP/UDP baseline. | Keep experimental; preserve tests and docs, but do not block `0.5.0`. |
-| `protocol-http` | Planned. | Keep planned unless needed by runtime docs; do not block `0.5.0`. |
+| `protocol-iec104` | Published typed parser. | Maintain compatibility; only add fixes and documented gap closures. |
+| `protocol-iec101` | Published `0.5.0` completion target. | Compatibility maintenance and bug fixes. |
+| `protocol-iec103` | Published `0.5.0` completion target. | Compatibility maintenance and bug fixes. |
+| `protocol-modbus` | Published experimental TCP/UDP baseline. | `0.6.0` stable completion target. |
+| `protocol-http` | Planned. | Keep planned unless needed by runtime docs; do not block `0.6.0`. |
 
-## `0.5.0` Release Gates
+## `0.6.0` Release Gates
 
 The release should not be tagged until these conditions are true.
 
@@ -49,86 +52,56 @@ General SDK gates:
 - No SDK module depends on Spring, Netty, databases, Redis, MQTT, Kafka, HTTP
   server frameworks, or runtime globals.
 - Every parser module preserves raw bytes for diagnostics.
-- Every experimental limitation is documented before publishing.
+- Every limitation that remains after Modbus stabilization is documented before
+  publishing.
 - Maven Central metadata, source jars, Javadoc jars, signatures, and checksums
   remain valid.
 
-IEC101 gates:
+Modbus gates:
 
-- Link-frame parsing covers single-character, fixed-length, and variable-length
-  FT1.2 frames with checksum validation, buffering, concatenation, and recovery.
-- Balanced and unbalanced control-field interpretation is documented and
-  fixture-backed.
-- Configurable link, COT, common-address, and information-object address
-  lengths have tests.
-- ASDU support matrix exists for typed, raw-only, and unknown Type IDs.
-- Time-tagged IEC101 values are modeled with IEC101-named public classes.
-- General interrogation, clock synchronization, and common command paths are
-  either typed or explicitly raw-only with tests.
-- Usage guide includes serial/TCP-bridge caller responsibilities without adding
-  runtime dependencies.
-
-IEC103 gates:
-
-- FT1.2 frame parsing covers common relay links with checksum validation,
-  buffering, concatenation, max-frame limits, and recovery tests.
-- ASDU header parsing exposes Type ID, VSQ, COT, common address, `FUN`, and
-  `INF`.
-- Protection event values cover time-tagged messages and relative-time event
-  payloads with quality, fault number, and time tag metadata.
-- Measurands I and II have typed value tests and documented conversion rules.
-- Identification payloads preserve raw bytes and expose stable public fields
-  where safe.
-- Generic data, disturbance records, and vendor-specific Type IDs are
-  classified as typed, raw-only, or unknown.
-- Support matrix and usage guide clearly describe what is complete, raw-only,
-  and deferred.
-
-Modbus gates before `0.5.0`:
-
-- Keep existing tests passing.
-- Keep README status as experimental.
-- Do not require Modbus support matrix completeness for `0.5.0`.
-- Do not block IEC101/IEC103 release work on Modbus stable coverage.
+- Support matrix exists for typed, raw-only, unknown, and deferred function
+  codes.
+- Usage guide covers TCP stream decoding, UDP datagram decoding,
+  request/response correlation, exception responses, and raw fallback.
+- Function codes `0x01`, `0x02`, `0x03`, `0x04`, `0x05`, `0x06`, `0x0F`, and
+  `0x10` have typed request/response fixture coverage.
+- Function code `0x17` is either promoted to typed request/response parsing or
+  explicitly deferred with a release decision before the stable label is used.
+- Standard exception responses expose encoded function code, original function
+  code, exception code, raw exception code, and raw bytes.
+- TCP and UDP malformed-frame behavior is fixture-backed and documented.
+- Standard quantity limits, byte counts, and PDU length validation are tested
+  for typed function codes.
+- Unknown and vendor-specific function codes preserve raw bytes when the ADU
+  and PDU envelope is valid.
 
 ## Recommended Work Order
 
-1. Add `0.5.0` milestone issues for IEC101 completion.
-2. Add `0.5.0` milestone issues for IEC103 completion.
-3. Add support matrices for IEC101 and IEC103.
-4. Add time-tagged IEC101 model and fixtures.
-5. Expand IEC103 protection event fixtures and measured value coverage.
-6. Audit docs so every module status matches actual parser behavior.
-7. Run full release readiness checks without publishing.
-8. Decide whether `0.5.0` publishes all modules or publishes only modules that
-   should be consumed externally.
-9. Prepare and execute the `0.5.0` Maven Central release.
-10. Create the next major phase backlog for Modbus stable completion.
+1. Add the Modbus support matrix for current typed, raw-only, unknown, and
+   deferred behavior.
+2. Add Modbus API usage docs.
+3. Promote or explicitly defer typed `0x17` support.
+4. Expand malformed MBAP/PDU fixture coverage for TCP and UDP decoders.
+5. Add standard quantity-limit and byte-count validation tests.
+6. Audit public Modbus model immutability and Java 8 compatibility.
+7. Prepare `0.6.0` readiness and release-note docs.
+8. Update README status only when Modbus stability gates are complete.
+9. Prepare and execute the `0.6.0` Maven Central release.
 
 ## Maven Central Publishing Decision
 
-The repository currently builds modules together under one parent version. That
-means a `0.5.0` release can publish experimental artifacts such as
-`protocol-modbus` even if Modbus is not a stability gate.
+The repository currently builds modules together under one parent version. The
+`0.5.0` release published experimental `protocol-modbus` artifacts with clear
+documentation. The `0.6.0` target should remove that experimental label only
+after the Modbus gates pass.
 
-Before the actual `0.5.0` release, choose one policy:
-
-| Policy | Effect |
-| --- | --- |
-| Publish all modules with clear experimental labels | Simpler Maven release; Modbus artifact exists at `0.5.0` but docs say it is experimental. |
-| Exclude experimental modules from publishing | Cleaner external signal, but requires Maven release profile work and more release complexity. |
-
-The selected `0.5.0` readiness policy is to publish all current reactor modules
-and mark Modbus experimental in README, module docs, and release notes. This
-keeps the Maven release simple and makes Modbus available for early adopters
-without turning it into a `0.5.0` stability gate.
-
-If that feels misleading later, add a release profile that skips experimental
-modules before tagging a future release.
+The selected `0.6.0` policy is to keep publishing the full reactor as one
+versioned SDK release. The release decision is about documentation and support
+posture: `protocol-modbus` becomes stable only when the `0.6.0` gates pass.
 
 ## Runtime Relationship
 
-The runtime roadmap does not block `0.5.0`.
+The runtime roadmap does not block `0.6.0`.
 
 `protocol-runtime` should consume released SDK artifacts, starting from the
 latest stable SDK version that includes the parser module it needs. Runtime
@@ -137,21 +110,21 @@ modules.
 
 ## Release Notes Shape
 
-`0.5.0` release notes should lead with:
+`0.6.0` release notes should lead with:
 
-- IEC101 parser completion scope and limitations.
-- IEC103 parser completion scope and limitations.
-- IEC104 compatibility status.
-- Modbus experimental status and next major phase plan.
+- Modbus TCP/UDP stable parser scope and limitations.
+- Function-code support matrix summary.
+- TCP stream and UDP datagram decoder behavior.
+- IEC101, IEC103, and IEC104 compatibility status.
 - Java 8 compatibility and JDK 21 build verification.
-- Maven Central dependency examples per stable or experimental module.
+- Maven Central dependency examples.
 
 ## Acceptance Criteria
 
 This roadmap is complete when:
 
-- `0.5.0` scope is clearly IEC101 and IEC103 focused.
-- Modbus is explicitly deferred from `0.5.0` completion gates.
+- `0.6.0` scope is clearly Modbus TCP/UDP stable completion.
+- Modbus stability gates are explicit.
 - Release gates identify what must be true before tagging.
 - The Maven Central publishing policy decision is visible.
 - Runtime work remains separate from SDK release gating.

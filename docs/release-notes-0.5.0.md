@@ -73,12 +73,17 @@ Most applications should not depend on the parent `protocol-sdk` POM directly.
 
 ## Verification
 
-Release candidate verification has passed locally:
+Release verification passed before publishing:
 
 - `mvn -q verify`
 - JDK 8 `mvn -q verify`
 - Central release profile smoke check with publishing disabled
 - signed dry run with `central.skipPublishing=true`
+- GitHub Actions release PR checks on JDK 8 and JDK 21
 
-The release PR must still pass GitHub Actions on JDK 8 and JDK 21 before tagging
-and publishing.
+## Publication
+
+- Git tag: `v0.5.0`
+- Commit: `3c248916c55d4226133c6c668de6406c03c24c8e`
+- Maven Central deployment: `8c59318b-99b8-422d-9935-86ce6bd442ac`
+- Maven Central deployment state: `PUBLISHED`
