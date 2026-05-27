@@ -5,15 +5,13 @@ legacy collector runtime and intentionally keeps only protocol parsing,
 streaming decoders, and strongly typed protocol models.
 
 The first public baseline started with IEC 60870-5-104, and the current
-release candidate line also includes IEC101, IEC103, and stable Modbus TCP/UDP
+published SDK line also includes IEC101, IEC103, and stable Modbus TCP/UDP
 parser modules. The SDK does not depend on Spring, Netty, databases, Redis,
 message queues, or collector runtime globals.
 
 ## Maven Central
 
-Release candidate: `0.6.0`
-
-Previous stable release: `0.5.0`
+Current stable release: `0.6.0`
 
 Use protocol modules directly in applications. For Modbus TCP/UDP parsing:
 
@@ -168,8 +166,8 @@ recognized information objects are returned as `ParseResult.error()` entries.
 - Source compatibility target: Java 8.
 - Release builds can run on JDK 21 with `--release 8`.
 - CI verifies the project on JDK 8 and JDK 21.
-- The current release candidate version is `0.6.0`; `0.5.0` remains the
-  previous stable Maven Central release until `0.6.0` is published.
+- The current stable Maven Central release is `0.6.0`; `0.5.0` remains the
+  previous IEC101/IEC103 completion release.
 
 ## Build
 

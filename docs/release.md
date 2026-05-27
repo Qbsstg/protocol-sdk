@@ -14,20 +14,22 @@ The first public release was `0.1.0` and included:
 The parent POM is for building the SDK workspace. Applications should depend on
 protocol modules directly.
 
-The latest published release is `0.5.0`; its readiness decision is documented
-in [`release-readiness-0.5.0.md`](release-readiness-0.5.0.md). The selected
-`0.5.0` policy was to publish the current Maven reactor as one versioned
-release, including experimental `protocol-modbus`, while release notes and
-module docs kept Modbus clearly marked as experimental and non-blocking.
+The latest published release is `0.6.0`; its readiness decision is documented
+in [`release-readiness-0.6.0.md`](release-readiness-0.6.0.md). The selected
+`0.6.0` policy was to publish the current Maven reactor as one versioned
+release and promote `protocol-modbus` to a stable parser module for the
+documented TCP/UDP MBAP ADU/PDU scope.
+
+The previous published release was `0.5.0`; its readiness decision is
+documented in [`release-readiness-0.5.0.md`](release-readiness-0.5.0.md). The
+selected `0.5.0` policy published `protocol-modbus` as experimental while
+completing the IEC101 and IEC103 parser milestones.
 
 The `0.5.0` release notes are maintained in
 [`release-notes-0.5.0.md`](release-notes-0.5.0.md).
 
-The current release candidate is `0.6.0`, focused on promoting
-`protocol-modbus` from an experimental TCP/UDP parser baseline to a stable
-parser module. Its readiness decision is documented in
-[`release-readiness-0.6.0.md`](release-readiness-0.6.0.md), and its release
-notes are maintained in [`release-notes-0.6.0.md`](release-notes-0.6.0.md).
+The `0.6.0` release notes are maintained in
+[`release-notes-0.6.0.md`](release-notes-0.6.0.md).
 
 ## Prerequisites
 

@@ -1,13 +1,13 @@
 # SDK Release Roadmap
 
-This roadmap defines the SDK release direction after the published `0.5.0`
-Maven Central release and the `0.6.0` Modbus release candidate.
+This roadmap defines the SDK release direction after the published `0.6.0`
+Maven Central release.
 
 The working product decision is:
 
 - `0.5.0` completed IEC101 and IEC103 as practical SDK modules and published
   Modbus as an experimental module.
-- `0.6.0` promotes Modbus TCP/UDP parsing from experimental to a stable SDK
+- `0.6.0` promoted Modbus TCP/UDP parsing from experimental to a stable SDK
   module for the documented parser-only scope.
 - The future JDK 21 collector runtime remains separate from SDK releases.
 
@@ -37,12 +37,12 @@ surface for common Modbus TCP and Modbus-over-UDP scenarios.
 | `protocol-iec104` | Published typed parser. | Maintain compatibility; only add fixes and documented gap closures. |
 | `protocol-iec101` | Published `0.5.0` completion target. | Compatibility maintenance and bug fixes. |
 | `protocol-iec103` | Published `0.5.0` completion target. | Compatibility maintenance and bug fixes. |
-| `protocol-modbus` | `0.6.0` release candidate stable TCP/UDP parser surface. | Compatibility maintenance and targeted function-code expansion. |
+| `protocol-modbus` | Published `0.6.0` stable TCP/UDP parser surface. | Compatibility maintenance and targeted function-code expansion. |
 | `protocol-http` | Planned. | Keep planned unless a future SDK phase needs HTTP helper APIs. |
 
 ## `0.6.0` Release Gates
 
-The `0.6.0` release should not be tagged until these conditions are true.
+The `0.6.0` release was tagged after these conditions were true.
 
 General SDK gates:
 
@@ -90,8 +90,8 @@ Modbus gates:
 
 The repository currently builds modules together under one parent version. The
 `0.5.0` release published experimental `protocol-modbus` artifacts with clear
-documentation. The `0.6.0` release candidate removes that experimental label
-after the selected Modbus gates have passed.
+documentation. The `0.6.0` release removed that experimental label after the
+selected Modbus gates passed.
 
 The selected `0.6.0` policy is to keep publishing the full reactor as one
 versioned SDK release. The release decision is about documentation and support
