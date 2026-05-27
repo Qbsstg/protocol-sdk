@@ -4,9 +4,10 @@ This matrix records the current `protocol-modbus` parser behavior. It describes
 the implemented Modbus TCP and common Modbus-over-UDP MBAP ADU parser surface;
 it is not a claim of full Modbus ecosystem coverage.
 
-`protocol-modbus` is still experimental in `0.5.0`. The `0.6.0` target is to
-use this matrix as the starting point for promoting the module to a stable
-TCP/UDP parser module.
+`protocol-modbus` is stable in `0.6.0` for the documented Modbus TCP and common
+Modbus-over-UDP MBAP ADU/PDU parser surface. It remains parser-only and does
+not claim Modbus RTU/ASCII serial framing, network clients, polling loops, or
+runtime ingestion behavior.
 
 ## Status Legend
 
@@ -26,10 +27,10 @@ original function code still determines the `ModbusSupport` classification.
 
 | Area | Current behavior | Notes for `0.6.0` |
 | --- | --- | --- |
-| TCP MBAP stream | `ModbusTcpStreamDecoder` buffers incomplete ADUs, decodes concatenated ADUs, validates protocol id by default, enforces MBAP length, and applies the configured max ADU length. | Add broader malformed-frame fixtures before claiming stable coverage. |
+| TCP MBAP stream | `ModbusTcpStreamDecoder` buffers incomplete ADUs, decodes concatenated ADUs, validates protocol id by default, enforces MBAP length, and applies the configured max ADU length. | Covered by normal, incomplete, concatenated, oversized, and malformed-frame fixtures. |
 | UDP MBAP datagram | `ModbusDatagramDecoder` treats one datagram as one ADU, rejects short datagrams as incomplete, and rejects trailing bytes by default. | Keep strict trailing-byte behavior documented; relaxed trailing bytes remain configuration-driven. |
 | Raw bytes | `ModbusTcpAdu`, `ModbusPdu`, typed values with payload data, exception responses, and raw values preserve defensive copies of wire bytes where applicable. | Continue preserving raw bytes for diagnostics and vendor-specific handling. |
-| RTU/ASCII serial framing | Not supported. | Keep out of SDK `0.6.0` unless a separate serial-framing module is explicitly planned. |
+| RTU/ASCII serial framing | Not supported. | Out of scope for SDK `0.6.0`. |
 | Network clients and polling | Not supported. | Belongs in a runtime/collector layer, not this parser SDK. |
 
 ## Function-Code Matrix
@@ -40,15 +41,15 @@ response payload alone.
 
 | Code | Name | Current support | Request value | Response value | Current validation and gaps |
 | --- | --- | --- | --- | --- | --- |
-| `0x01` | Read coils | `TYPED` | `ModbusAddressRange` for 5-byte requests. | `ModbusBitValues` for byte-count responses. | Validates response byte count. Does not yet validate standard request quantity limits. Response bit arrays are unpacked to `byteCount * 8` bits because the response does not carry requested quantity. |
-| `0x02` | Read discrete inputs | `TYPED` | `ModbusAddressRange` for 5-byte requests. | `ModbusBitValues` for byte-count responses. | Same behavior and gaps as `0x01`. |
-| `0x03` | Read holding registers | `TYPED` | `ModbusAddressRange` for 5-byte requests. | `ModbusRegisterValues` for byte-count responses. | Validates response byte count and even register payload length. Does not yet validate standard request quantity limits. |
-| `0x04` | Read input registers | `TYPED` | `ModbusAddressRange` for 5-byte requests. | `ModbusRegisterValues` for byte-count responses. | Same behavior and gaps as `0x03`. |
-| `0x05` | Write single coil | `TYPED` | `ModbusWriteSingleValue`. | `ModbusWriteSingleValue` echo. | Validates 5-byte PDU length. Does not yet reject non-standard coil values outside `0x0000` and `0xFF00`. |
+| `0x01` | Read coils | `TYPED` | `ModbusAddressRange` for 5-byte requests. | `ModbusBitValues` for byte-count responses. | Validates request quantity `1..2000` and response byte count. Response bit arrays are unpacked to `byteCount * 8` bits because the response does not carry requested quantity. |
+| `0x02` | Read discrete inputs | `TYPED` | `ModbusAddressRange` for 5-byte requests. | `ModbusBitValues` for byte-count responses. | Same behavior as `0x01`. |
+| `0x03` | Read holding registers | `TYPED` | `ModbusAddressRange` for 5-byte requests. | `ModbusRegisterValues` for byte-count responses. | Validates request quantity `1..125`, response byte count, and even register payload length. |
+| `0x04` | Read input registers | `TYPED` | `ModbusAddressRange` for 5-byte requests. | `ModbusRegisterValues` for byte-count responses. | Same behavior as `0x03`. |
+| `0x05` | Write single coil | `TYPED` | `ModbusWriteSingleValue`. | `ModbusWriteSingleValue` echo. | Validates 5-byte PDU length and standard coil values `0x0000` or `0xFF00`. |
 | `0x06` | Write single register | `TYPED` | `ModbusWriteSingleValue`. | `ModbusWriteSingleValue` echo. | Validates 5-byte PDU length. |
-| `0x0F` | Write multiple coils | `TYPED` | `ModbusWriteMultipleBitsValue` for payload requests. | `ModbusAddressRange` for 5-byte response echoes. | Validates PDU length against byte count. Does not yet validate standard quantity limits or byte count against `ceil(quantity / 8)`. |
-| `0x10` | Write multiple registers | `TYPED` | `ModbusWriteMultipleRegistersValue` for payload requests. | `ModbusAddressRange` for 5-byte response echoes. | Validates PDU length against byte count and rejects odd register byte counts. Does not yet validate standard quantity limits or byte count against `quantity * 2`. |
-| `0x17` | Read/write multiple registers | `RAW_ONLY` | `ModbusRawValue`. | `ModbusRawValue`. | Known function code, but payload is intentionally not interpreted in the current baseline. This is the main `0.6.0` typed-coverage gap. |
+| `0x0F` | Write multiple coils | `TYPED` | `ModbusWriteMultipleBitsValue` for payload requests. | `ModbusAddressRange` for 5-byte response echoes. | Validates quantity `1..1968`, PDU length, and byte count against `ceil(quantity / 8)`. |
+| `0x10` | Write multiple registers | `TYPED` | `ModbusWriteMultipleRegistersValue` for payload requests. | `ModbusAddressRange` for 5-byte response echoes. | Validates quantity `1..123`, PDU length, byte count against `quantity * 2`, and even register byte counts. |
+| `0x17` | Read/write multiple registers | `TYPED` | `ModbusReadWriteMultipleRegistersValue` for request payloads. | `ModbusRegisterValues` for byte-count responses. | Validates PDU length, request byte count against write quantity, and even register payloads. Standard `0x17` read/write quantity limits are not separately enforced. |
 | Unknown/vendor codes | Vendor-specific or deferred functions | `UNKNOWN` | `ModbusRawValue`. | `ModbusRawValue`. | The parser preserves payload bytes when the ADU and PDU envelope is valid. Typed behavior is deferred until the code is explicitly modeled. |
 
 ## Deferred Standard Function Codes
@@ -98,17 +99,14 @@ Typed exception-code coverage:
 | `0x0A` | Gateway path unavailable |
 | `0x0B` | Gateway target device failed to respond |
 
-## `0.6.0` Follow-Up Items
+## Post-`0.6.0` Follow-Up Items
 
-Use this matrix to drive the next Modbus stabilization tasks:
+Use this matrix to drive future Modbus expansion without widening the `0.6.0`
+stable claim:
 
-1. Promote `0x17` read/write multiple registers from `RAW_ONLY` to typed
-   request and response parsing.
-2. Add standard quantity-limit validation for typed read and write functions.
-3. Add byte-count validation tied to quantity for `0x0F` and `0x10` requests.
-4. Add write-single-coil value validation for `0x05`.
-5. Expand malformed MBAP and malformed PDU fixtures for both TCP and UDP
-   decoders.
-6. Add a public Modbus usage guide that explains TCP stream decoding, UDP
-   datagram decoding, request/response correlation, exception responses, and
-   raw fallback.
+1. Add typed support for selected deferred standard function codes when real
+   integrations need them.
+2. Add optional Modbus RTU/ASCII serial framing in a separate parser surface if
+   the project decides to support serial deployments.
+3. Add stricter `0x17` read/write quantity-limit validation if a compatibility
+   review confirms it will not reject common field-device behavior unexpectedly.

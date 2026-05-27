@@ -18,14 +18,16 @@ The latest published release is `0.5.0`; its readiness decision is documented
 in [`release-readiness-0.5.0.md`](release-readiness-0.5.0.md). The selected
 `0.5.0` policy was to publish the current Maven reactor as one versioned
 release, including experimental `protocol-modbus`, while release notes and
-module docs keep Modbus clearly marked as experimental and non-blocking.
+module docs kept Modbus clearly marked as experimental and non-blocking.
 
 The `0.5.0` release notes are maintained in
 [`release-notes-0.5.0.md`](release-notes-0.5.0.md).
 
-The next SDK target is `0.6.0`, focused on promoting `protocol-modbus` from an
-experimental TCP/UDP parser baseline to a stable parser module. The plan is
-tracked in [`release-plan-0.6.0.md`](release-plan-0.6.0.md).
+The current release candidate is `0.6.0`, focused on promoting
+`protocol-modbus` from an experimental TCP/UDP parser baseline to a stable
+parser module. Its readiness decision is documented in
+[`release-readiness-0.6.0.md`](release-readiness-0.6.0.md), and its release
+notes are maintained in [`release-notes-0.6.0.md`](release-notes-0.6.0.md).
 
 ## Prerequisites
 
@@ -126,8 +128,9 @@ scope, tag policy, and rollback expectations are settled.
 
 1. Confirm `main` is clean and CI is green.
 2. Confirm the release-readiness note for the target version is current.
-3. Update versions from the current `-SNAPSHOT` version to the release version.
-4. Confirm README and module docs label experimental modules accurately.
+3. Update versions from the previous release or development version to the
+   release version.
+4. Confirm README and module docs label module stability accurately.
 5. Run `mvn -q verify`.
 6. Run the signed dry run.
 7. Tag the release commit.

@@ -5,9 +5,10 @@ common Modbus-over-UDP MBAP ADUs. It is a parser SDK only: it does not open
 sockets, manage polling schedules, retry requests, maintain device registries,
 or store telemetry.
 
-The module is experimental in the `0.5.x` line. The examples below describe the
-current public API shape and the caller responsibilities that should remain true
-as the module moves toward the `0.6.0` stable target.
+The module is stable in the `0.6.0` line for the documented Modbus TCP and
+common Modbus-over-UDP MBAP ADU/PDU parser surface. The examples below describe
+the public API shape and the caller responsibilities that stay outside this
+parser SDK.
 
 ## Maven Dependency
 
@@ -17,7 +18,7 @@ Use the Modbus module directly:
 <dependency>
     <groupId>io.github.qbsstg</groupId>
     <artifactId>protocol-modbus</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
@@ -318,8 +319,9 @@ public final class ModbusRawFallbackExample {
 }
 ```
 
-Known-but-deferred function code `0x17` also currently returns
-`ModbusRawValue`, but its support status is `RAW_ONLY` rather than `UNKNOWN`.
+Known but intentionally deferred function codes use `ModbusRawValue` with
+`RAW_ONLY` support when they are explicitly modeled. Unknown or vendor-specific
+function codes also use `ModbusRawValue`, with `UNKNOWN` support.
 
 ## Error Handling
 
@@ -333,6 +335,7 @@ diagnostic message and consumed byte count. Examples include:
 - function-specific PDU length mismatch
 - response byte count mismatch
 - odd register byte count
+- standard quantity-limit violations for typed read/write paths
 - malformed exception response length
 
 Use `ParseResult.isIncomplete()` for short UDP datagrams or incomplete TCP
@@ -351,7 +354,7 @@ The current typed parser surface covers common process-data function codes:
 - `0x06` write single register
 - `0x0F` write multiple coils
 - `0x10` write multiple registers
+- `0x17` read/write multiple registers
 
-Function code `0x17` is known but raw-only in the current baseline. Other
-standard or vendor-specific function codes are preserved as raw payloads when
-the envelope is valid.
+Other standard or vendor-specific function codes are preserved as raw payloads
+when the envelope is valid.

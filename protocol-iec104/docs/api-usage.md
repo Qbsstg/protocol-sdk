@@ -11,7 +11,7 @@ Most applications should depend on `protocol-iec104` directly:
 <dependency>
     <groupId>io.github.qbsstg</groupId>
     <artifactId>protocol-iec104</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
@@ -129,5 +129,5 @@ The SDK source and public examples stay Java 8 compatible. Repository builds can
 run on JDK 21 while compiling release artifacts with `--release 8`. CI verifies
 the project on JDK 8 and JDK 21.
 
-Use Maven Central version `0.5.0` with this release candidate. Version `0.1.0`
-is the previous stable IEC104 baseline.
+Use Maven Central version `0.6.0` with this release candidate. Version `0.5.0`
+is the previous stable SDK baseline.

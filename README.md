@@ -5,37 +5,49 @@ legacy collector runtime and intentionally keeps only protocol parsing,
 streaming decoders, and strongly typed protocol models.
 
 The first public baseline started with IEC 60870-5-104, and the current
-published SDK line also includes IEC101, IEC103, and experimental Modbus
-modules. The SDK does not depend on Spring, Netty, databases, Redis, message
-queues, or collector runtime globals.
+release candidate line also includes IEC101, IEC103, and stable Modbus TCP/UDP
+parser modules. The SDK does not depend on Spring, Netty, databases, Redis,
+message queues, or collector runtime globals.
 
 ## Maven Central
 
-Current stable release: `0.5.0`
+Release candidate: `0.6.0`
 
-Use the protocol module directly in applications:
+Previous stable release: `0.5.0`
+
+Use protocol modules directly in applications. For Modbus TCP/UDP parsing:
+
+```xml
+<dependency>
+    <groupId>io.github.qbsstg</groupId>
+    <artifactId>protocol-modbus</artifactId>
+    <version>0.6.0</version>
+</dependency>
+```
+
+Existing IEC users can use the same reactor version:
 
 ```xml
 <dependency>
     <groupId>io.github.qbsstg</groupId>
     <artifactId>protocol-iec104</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
 The shared core contracts are published separately and are pulled transitively
-by `protocol-iec104`:
+by protocol modules:
 
 ```xml
 <dependency>
     <groupId>io.github.qbsstg</groupId>
     <artifactId>protocol-core</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
 The parent `protocol-sdk` POM is for building this repository. Most users should
-depend on protocol modules such as `protocol-iec104`.
+depend on protocol modules such as `protocol-modbus` or `protocol-iec104`.
 
 ## Quick Usage
 
@@ -100,12 +112,13 @@ and the
 | `protocol-iec104` | Published | IEC 60870-5-104 APDU, ASDU, information object, and typed value parser. |
 | `protocol-iec101` | Published | IEC 60870-5-101 FT1.2 frame parser and practical ASDU completion target. [Support matrix](protocol-iec101/docs/asdu-support-matrix.md). |
 | `protocol-iec103` | Published | IEC 60870-5-103 FT1.2 frame parser with protection event, measurand, identification, and raw fallback completion target. [Support matrix](protocol-iec103/docs/asdu-support-matrix.md), [Design note](docs/iec103-module-design.md), [Usage](protocol-iec103/docs/api-usage.md). |
-| `protocol-modbus` | Experimental, `0.6.0` target | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. [Design note](docs/protocol-modbus-design.md), [0.6.0 plan](docs/release-plan-0.6.0.md). |
+| `protocol-modbus` | `0.6.0` stable | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. [Support matrix](protocol-modbus/docs/function-support-matrix.md), [Usage](protocol-modbus/docs/api-usage.md), [Design note](docs/protocol-modbus-design.md). |
 | `protocol-http` | Planned | HTTP protocol helpers for collection scenarios. |
 
-`0.6.0` is planned as the Modbus stable-completion release. Modbus remains
-experimental until the `0.6.0` gates in
-[`docs/release-plan-0.6.0.md`](docs/release-plan-0.6.0.md) are complete.
+`0.6.0` promotes `protocol-modbus` to a stable parser module for practical
+Modbus TCP and common Modbus-over-UDP MBAP ADU/PDU parsing. The scope remains
+parser-only; serial RTU/ASCII framing, socket clients, polling, retry policy,
+device registries, and ingestion adapters belong outside this SDK.
 
 ## IEC104 Coverage
 
@@ -155,7 +168,8 @@ recognized information objects are returned as `ParseResult.error()` entries.
 - Source compatibility target: Java 8.
 - Release builds can run on JDK 21 with `--release 8`.
 - CI verifies the project on JDK 8 and JDK 21.
-- The current stable Maven Central release is `0.5.0`.
+- The current release candidate version is `0.6.0`; `0.5.0` remains the
+  previous stable Maven Central release until `0.6.0` is published.
 
 ## Build
 
@@ -196,12 +210,11 @@ and the ingestion adapter roadmap is documented in
 ## Roadmap
 
 - Complete an IEC104 conformance and gap audit before adding more IEC104 types.
-- Focus the next SDK release phase on Modbus TCP/UDP stable completion. The SDK
-  release plan is tracked in [`docs/sdk-release-roadmap.md`](docs/sdk-release-roadmap.md)
-  and [`docs/release-plan-0.6.0.md`](docs/release-plan-0.6.0.md).
-- The `0.5.0` readiness decision is tracked in
-  [`docs/release-readiness-0.5.0.md`](docs/release-readiness-0.5.0.md).
-- Keep Modbus experimental until the `0.6.0` stability gates are complete.
+- The `0.6.0` readiness decision is tracked in
+  [`docs/release-readiness-0.6.0.md`](docs/release-readiness-0.6.0.md), with
+  release notes in [`docs/release-notes-0.6.0.md`](docs/release-notes-0.6.0.md).
+- Future SDK phases can add more protocol helpers or broader Modbus function
+  coverage without moving runtime concerns into this parser SDK.
 - Build a future collector runtime on JDK 21 outside this SDK repository. The
   runtime architecture and ingestion roadmap are tracked in
   [`docs/runtime-platform-architecture.md`](docs/runtime-platform-architecture.md)

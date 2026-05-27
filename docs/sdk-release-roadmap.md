@@ -1,15 +1,14 @@
 # SDK Release Roadmap
 
 This roadmap defines the SDK release direction after the published `0.5.0`
-Maven Central release and the first parser baselines for IEC101, IEC103, and
-Modbus.
+Maven Central release and the `0.6.0` Modbus release candidate.
 
 The working product decision is:
 
 - `0.5.0` completed IEC101 and IEC103 as practical SDK modules and published
   Modbus as an experimental module.
-- `0.6.0` focuses on promoting Modbus TCP/UDP parsing from experimental to a
-  stable SDK module.
+- `0.6.0` promotes Modbus TCP/UDP parsing from experimental to a stable SDK
+  module for the documented parser-only scope.
 - The future JDK 21 collector runtime remains separate from SDK releases.
 
 ## Version Intent
@@ -21,7 +20,7 @@ The working product decision is:
 | `0.3.0` | IEC101 hardening release. | Add fixtures, support matrix, malformed-frame behavior, time-tagged values, and usage docs. |
 | `0.4.0` | IEC103 hardening release. | Add protection relay fixtures, support matrix, relay event coverage, and clearer raw-only boundaries. |
 | `0.5.0` | IEC101 and IEC103 completion target. | Practical open-source SDK release for IEC101, IEC103, and existing IEC104 use cases. |
-| `0.6.0` | Modbus stable completion. | Promote `protocol-modbus` from experimental to a stable TCP/UDP parser module after release gates pass. |
+| `0.6.0` | Modbus stable completion. | Promote `protocol-modbus` from experimental to a stable TCP/UDP parser module for the documented parser-only scope. |
 
 The `0.6.0` plan is tracked in
 [`release-plan-0.6.0.md`](release-plan-0.6.0.md).
@@ -38,12 +37,12 @@ surface for common Modbus TCP and Modbus-over-UDP scenarios.
 | `protocol-iec104` | Published typed parser. | Maintain compatibility; only add fixes and documented gap closures. |
 | `protocol-iec101` | Published `0.5.0` completion target. | Compatibility maintenance and bug fixes. |
 | `protocol-iec103` | Published `0.5.0` completion target. | Compatibility maintenance and bug fixes. |
-| `protocol-modbus` | Published experimental TCP/UDP baseline. | `0.6.0` stable completion target. |
-| `protocol-http` | Planned. | Keep planned unless needed by runtime docs; do not block `0.6.0`. |
+| `protocol-modbus` | `0.6.0` release candidate stable TCP/UDP parser surface. | Compatibility maintenance and targeted function-code expansion. |
+| `protocol-http` | Planned. | Keep planned unless a future SDK phase needs HTTP helper APIs. |
 
 ## `0.6.0` Release Gates
 
-The release should not be tagged until these conditions are true.
+The `0.6.0` release should not be tagged until these conditions are true.
 
 General SDK gates:
 
@@ -65,8 +64,7 @@ Modbus gates:
   request/response correlation, exception responses, and raw fallback.
 - Function codes `0x01`, `0x02`, `0x03`, `0x04`, `0x05`, `0x06`, `0x0F`, and
   `0x10` have typed request/response fixture coverage.
-- Function code `0x17` is either promoted to typed request/response parsing or
-  explicitly deferred with a release decision before the stable label is used.
+- Function code `0x17` is promoted to typed request/response parsing.
 - Standard exception responses expose encoded function code, original function
   code, exception code, raw exception code, and raw bytes.
 - TCP and UDP malformed-frame behavior is fixture-backed and documented.
@@ -92,8 +90,8 @@ Modbus gates:
 
 The repository currently builds modules together under one parent version. The
 `0.5.0` release published experimental `protocol-modbus` artifacts with clear
-documentation. The `0.6.0` target should remove that experimental label only
-after the Modbus gates pass.
+documentation. The `0.6.0` release candidate removes that experimental label
+after the selected Modbus gates have passed.
 
 The selected `0.6.0` policy is to keep publishing the full reactor as one
 versioned SDK release. The release decision is about documentation and support
