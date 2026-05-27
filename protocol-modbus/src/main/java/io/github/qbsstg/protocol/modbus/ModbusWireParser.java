@@ -5,6 +5,11 @@ import io.github.qbsstg.protocol.core.util.ByteArrayUtil;
 
 final class ModbusWireParser {
 
+    private static final int MAX_READ_BITS_QUANTITY = 2000;
+    private static final int MAX_READ_REGISTERS_QUANTITY = 125;
+    private static final int MAX_WRITE_MULTIPLE_COILS_QUANTITY = 1968;
+    private static final int MAX_WRITE_MULTIPLE_REGISTERS_QUANTITY = 123;
+
     private ModbusWireParser() {
     }
 
@@ -84,14 +89,22 @@ final class ModbusWireParser {
 
     private static PduParse parseBitRead(int functionCode, byte[] pduBytes) {
         if (pduBytes.length == 5) {
+            int quantity = readUnsignedShort(pduBytes, 3);
+            PduParse validation = validateQuantity("bit read quantity", quantity, 1, MAX_READ_BITS_QUANTITY);
+            if (validation != null) {
+                return validation;
+            }
             return PduParse.success(new ModbusPdu(functionCode,
-                    new ModbusAddressRange(readUnsignedShort(pduBytes, 1), readUnsignedShort(pduBytes, 3)),
+                    new ModbusAddressRange(readUnsignedShort(pduBytes, 1), quantity),
                     pduBytes));
         }
         if (pduBytes.length < 2) {
             return PduParse.error("Invalid Modbus bit response length: " + pduBytes.length);
         }
         int byteCount = ByteArrayUtil.unsignedByte(pduBytes[1]);
+        if (byteCount < 1 || byteCount > 250) {
+            return PduParse.error("Invalid Modbus bit response byte count: " + byteCount);
+        }
         if (pduBytes.length != 2 + byteCount) {
             return PduParse.error("Invalid Modbus bit response byte count: " + byteCount);
         }
@@ -102,14 +115,23 @@ final class ModbusWireParser {
 
     private static PduParse parseRegisterRead(int functionCode, byte[] pduBytes) {
         if (pduBytes.length == 5) {
+            int quantity = readUnsignedShort(pduBytes, 3);
+            PduParse validation = validateQuantity("register read quantity", quantity, 1,
+                    MAX_READ_REGISTERS_QUANTITY);
+            if (validation != null) {
+                return validation;
+            }
             return PduParse.success(new ModbusPdu(functionCode,
-                    new ModbusAddressRange(readUnsignedShort(pduBytes, 1), readUnsignedShort(pduBytes, 3)),
+                    new ModbusAddressRange(readUnsignedShort(pduBytes, 1), quantity),
                     pduBytes));
         }
         if (pduBytes.length < 2) {
             return PduParse.error("Invalid Modbus register response length: " + pduBytes.length);
         }
         int byteCount = ByteArrayUtil.unsignedByte(pduBytes[1]);
+        if (byteCount < 2 || byteCount > 250) {
+            return PduParse.error("Invalid Modbus register response byte count: " + byteCount);
+        }
         if (pduBytes.length != 2 + byteCount) {
             return PduParse.error("Invalid Modbus register response byte count: " + byteCount);
         }
@@ -125,15 +147,25 @@ final class ModbusWireParser {
         if (pduBytes.length != 5) {
             return PduParse.error("Invalid Modbus write single length: " + pduBytes.length);
         }
+        int value = readUnsignedShort(pduBytes, 3);
+        if (functionCode == 0x05 && value != 0x0000 && value != 0xFF00) {
+            return PduParse.error("Invalid Modbus write single coil value: " + value);
+        }
         return PduParse.success(new ModbusPdu(functionCode,
-                new ModbusWriteSingleValue(readUnsignedShort(pduBytes, 1), readUnsignedShort(pduBytes, 3)),
+                new ModbusWriteSingleValue(readUnsignedShort(pduBytes, 1), value),
                 pduBytes));
     }
 
     private static PduParse parseWriteMultipleBits(int functionCode, byte[] pduBytes) {
         if (pduBytes.length == 5) {
+            int quantity = readUnsignedShort(pduBytes, 3);
+            PduParse validation = validateQuantity("write multiple coils quantity", quantity, 1,
+                    MAX_WRITE_MULTIPLE_COILS_QUANTITY);
+            if (validation != null) {
+                return validation;
+            }
             return PduParse.success(new ModbusPdu(functionCode,
-                    new ModbusAddressRange(readUnsignedShort(pduBytes, 1), readUnsignedShort(pduBytes, 3)),
+                    new ModbusAddressRange(readUnsignedShort(pduBytes, 1), quantity),
                     pduBytes));
         }
         if (pduBytes.length < 6) {
@@ -141,7 +173,16 @@ final class ModbusWireParser {
         }
         int startAddress = readUnsignedShort(pduBytes, 1);
         int quantity = readUnsignedShort(pduBytes, 3);
+        PduParse validation = validateQuantity("write multiple coils quantity", quantity, 1,
+                MAX_WRITE_MULTIPLE_COILS_QUANTITY);
+        if (validation != null) {
+            return validation;
+        }
         int byteCount = ByteArrayUtil.unsignedByte(pduBytes[5]);
+        int expectedByteCount = (quantity + 7) / 8;
+        if (byteCount != expectedByteCount) {
+            return PduParse.error("Invalid Modbus write multiple coils byte count: " + byteCount);
+        }
         if (pduBytes.length != 6 + byteCount) {
             return PduParse.error("Invalid Modbus write multiple coils byte count: " + byteCount);
         }
@@ -154,8 +195,14 @@ final class ModbusWireParser {
 
     private static PduParse parseWriteMultipleRegisters(int functionCode, byte[] pduBytes) {
         if (pduBytes.length == 5) {
+            int quantity = readUnsignedShort(pduBytes, 3);
+            PduParse validation = validateQuantity("write multiple registers quantity", quantity, 1,
+                    MAX_WRITE_MULTIPLE_REGISTERS_QUANTITY);
+            if (validation != null) {
+                return validation;
+            }
             return PduParse.success(new ModbusPdu(functionCode,
-                    new ModbusAddressRange(readUnsignedShort(pduBytes, 1), readUnsignedShort(pduBytes, 3)),
+                    new ModbusAddressRange(readUnsignedShort(pduBytes, 1), quantity),
                     pduBytes));
         }
         if (pduBytes.length < 6) {
@@ -163,7 +210,15 @@ final class ModbusWireParser {
         }
         int startAddress = readUnsignedShort(pduBytes, 1);
         int quantity = readUnsignedShort(pduBytes, 3);
+        PduParse validation = validateQuantity("write multiple registers quantity", quantity, 1,
+                MAX_WRITE_MULTIPLE_REGISTERS_QUANTITY);
+        if (validation != null) {
+            return validation;
+        }
         int byteCount = ByteArrayUtil.unsignedByte(pduBytes[5]);
+        if (byteCount != quantity * 2) {
+            return PduParse.error("Invalid Modbus write multiple registers byte count: " + byteCount);
+        }
         if (pduBytes.length != 6 + byteCount) {
             return PduParse.error("Invalid Modbus write multiple registers byte count: " + byteCount);
         }
@@ -236,6 +291,13 @@ final class ModbusWireParser {
             values[i] = readUnsignedShort(rawData, i * 2);
         }
         return values;
+    }
+
+    private static PduParse validateQuantity(String field, int quantity, int min, int max) {
+        if (quantity < min || quantity > max) {
+            return PduParse.error("Invalid Modbus " + field + ": " + quantity);
+        }
+        return null;
     }
 
     private static int readUnsignedShort(byte[] bytes, int offset) {

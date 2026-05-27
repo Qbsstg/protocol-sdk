@@ -148,6 +148,86 @@ public class ModbusPduValueTest {
         assertTrue(result.getMessage().contains("read/write multiple registers response byte count"));
     }
 
+    @Test
+    public void rejectsReadCoilsQuantityOutsideStandardRange() {
+        assertErrorContains(bytes(
+                0x00, 0x10, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x01, 0x00, 0x13, 0x00, 0x00),
+                "bit read quantity");
+
+        assertErrorContains(bytes(
+                0x00, 0x11, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x02, 0x00, 0x13, 0x07, 0xD1),
+                "bit read quantity");
+    }
+
+    @Test
+    public void rejectsReadRegistersQuantityOutsideStandardRange() {
+        assertErrorContains(bytes(
+                0x00, 0x12, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x03, 0x00, 0x6B, 0x00, 0x00),
+                "register read quantity");
+
+        assertErrorContains(bytes(
+                0x00, 0x13, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x04, 0x00, 0x6B, 0x00, 0x7E),
+                "register read quantity");
+    }
+
+    @Test
+    public void rejectsInvalidReadResponseByteCounts() {
+        assertErrorContains(bytes(
+                0x00, 0x14, 0x00, 0x00, 0x00, 0x03,
+                0x11, 0x01, 0x00),
+                "bit response byte count");
+
+        assertErrorContains(bytes(
+                0x00, 0x15, 0x00, 0x00, 0x00, 0x03,
+                0x11, 0x03, 0x00),
+                "register response byte count");
+    }
+
+    @Test
+    public void rejectsWriteSingleCoilValuesOutsideStandardSet() {
+        assertErrorContains(bytes(
+                0x00, 0x16, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x05, 0x00, 0xAC, 0x00, 0x01),
+                "write single coil value");
+    }
+
+    @Test
+    public void rejectsWriteMultipleCoilsQuantityAndByteCountMismatch() {
+        assertErrorContains(bytes(
+                0x00, 0x17, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x0F, 0x00, 0x13, 0x07, 0xB1),
+                "write multiple coils quantity");
+
+        assertErrorContains(bytes(
+                0x00, 0x18, 0x00, 0x00, 0x00, 0x08,
+                0x11, 0x0F, 0x00, 0x13, 0x00, 0x0A, 0x01, 0xCD),
+                "write multiple coils byte count");
+    }
+
+    @Test
+    public void rejectsWriteMultipleRegistersQuantityAndByteCountMismatch() {
+        assertErrorContains(bytes(
+                0x00, 0x19, 0x00, 0x00, 0x00, 0x06,
+                0x11, 0x10, 0x00, 0x01, 0x00, 0x7C),
+                "write multiple registers quantity");
+
+        assertErrorContains(bytes(
+                0x00, 0x1A, 0x00, 0x00, 0x00, 0x09,
+                0x11, 0x10, 0x00, 0x01, 0x00, 0x02, 0x02, 0x00, 0x0A),
+                "write multiple registers byte count");
+    }
+
+    private static void assertErrorContains(byte[] datagram, String message) {
+        ParseResult<ModbusTcpAdu> result = new ModbusDatagramDecoder().decode(datagram);
+
+        assertTrue(result.isError());
+        assertTrue(result.getMessage().contains(message));
+    }
+
     private static byte[] bytes(int... values) {
         byte[] bytes = new byte[values.length];
         for (int i = 0; i < values.length; i++) {
