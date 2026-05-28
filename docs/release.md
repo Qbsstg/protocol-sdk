@@ -20,6 +20,12 @@ in [`release-readiness-0.6.0.md`](release-readiness-0.6.0.md). The selected
 release and promote `protocol-modbus` to a stable parser module for the
 documented TCP/UDP MBAP ADU/PDU scope.
 
+The `0.7.0` IEC104 hardening release candidate is documented in
+[`release-readiness-0.7.0.md`](release-readiness-0.7.0.md). The release should
+not be tagged or published until the final release branch passes the local,
+Java 8, Central profile, signed dry-run, and GitHub Actions checks described
+there.
+
 The previous published release was `0.5.0`; its readiness decision is
 documented in [`release-readiness-0.5.0.md`](release-readiness-0.5.0.md). The
 selected `0.5.0` policy published `protocol-modbus` as experimental while
@@ -30,6 +36,9 @@ The `0.5.0` release notes are maintained in
 
 The `0.6.0` release notes are maintained in
 [`release-notes-0.6.0.md`](release-notes-0.6.0.md).
+
+The `0.7.0` release-note draft is maintained in
+[`release-notes-0.7.0.md`](release-notes-0.7.0.md).
 
 ## Prerequisites
 
