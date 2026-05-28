@@ -126,8 +126,8 @@ The detailed support matrix is maintained in
 
 ## Verification
 
-The `0.6.0` release candidate should not be tagged until these checks pass on
-the merged candidate commit:
+The `0.6.0` release was tagged after these checks passed on the merged release
+commit:
 
 - `mvn -q -pl protocol-modbus -am test`
 - `mvn -q verify`
@@ -136,5 +136,5 @@ the merged candidate commit:
 - Central release profile smoke check with publishing disabled
 - signed dry run with `central.skipPublishing=true`
 
-After publication, verify that external projects can resolve the `0.6.0`
-artifacts from Maven Central.
+After publication, an isolated temporary Maven consumer resolved and compiled
+against the `0.6.0` artifacts from Maven Central.
