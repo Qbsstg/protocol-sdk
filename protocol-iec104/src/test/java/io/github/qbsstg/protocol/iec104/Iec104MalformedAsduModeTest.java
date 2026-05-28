@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class Iec104MalformedAsduModeTest {
@@ -33,6 +34,41 @@ public class Iec104MalformedAsduModeTest {
         assertEquals(19, results.get(0).getConsumedBytes());
         assertTrue(results.get(0).getMessage().contains("Truncated IEC104 information element"));
         assertTrue(results.get(0).getMessage().contains("M_SP_NA_1"));
+    }
+
+    @Test
+    public void strictModeRejectsTruncatedAsduHeader() {
+        Iec104StreamDecoder decoder = new Iec104StreamDecoder(true);
+
+        List<ParseResult<Iec104Frame>> results = decoder.decode(bytes(
+                0x68, 0x06,
+                0x00, 0x00, 0x00, 0x00,
+                0x01, 0x01));
+
+        assertEquals(1, results.size());
+        assertTrue(results.get(0).isError());
+        assertEquals(8, results.get(0).getConsumedBytes());
+        assertTrue(results.get(0).getMessage().contains("Truncated IEC104 ASDU header"));
+        assertTrue(results.get(0).getMessage().contains("expected 6 bytes after APCI, available 2"));
+    }
+
+    @Test
+    public void strictModeRejectsTruncatedInformationObjectAddress() {
+        Iec104StreamDecoder decoder = new Iec104StreamDecoder(true);
+
+        List<ParseResult<Iec104Frame>> results = decoder.decode(bytes(
+                0x68, 0x0C,
+                0x00, 0x00, 0x00, 0x00,
+                0x01, 0x01, 0x03, 0x00,
+                0x01, 0x00,
+                0x34, 0x12));
+
+        assertEquals(1, results.size());
+        assertTrue(results.get(0).isError());
+        assertEquals(14, results.get(0).getConsumedBytes());
+        assertTrue(results.get(0).getMessage().contains("Truncated IEC104 information object address"));
+        assertTrue(results.get(0).getMessage().contains("M_SP_NA_1"));
+        assertTrue(results.get(0).getMessage().contains("expected 3 bytes, available 2"));
     }
 
     @Test
@@ -70,6 +106,28 @@ public class Iec104MalformedAsduModeTest {
         assertTrue(results.get(0).isError());
         assertTrue(results.get(0).getMessage().contains("Truncated IEC104 information element"));
         assertTrue(results.get(0).getMessage().contains("expected 2 bytes, available 1"));
+    }
+
+    @Test
+    public void strictModeKeepsRawOnlyCatalogPayloadPermissive() {
+        Iec104StreamDecoder decoder = new Iec104StreamDecoder(true);
+
+        List<ParseResult<Iec104Frame>> results = decoder.decode(bytes(
+                0x68, 0x0E,
+                0x00, 0x00, 0x00, 0x00,
+                0x78, 0x01, 0x03, 0x00,
+                0x01, 0x00,
+                0x34, 0x12, 0x00,
+                0xAA, 0xBB));
+
+        assertEquals(1, results.size());
+        assertTrue(results.get(0).isSuccess());
+
+        Iec104Asdu asdu = results.get(0).getFrame().getAsdu();
+        assertEquals(Iec104AsduType.F_FR_NA_1, asdu.getType());
+        assertEquals(1, asdu.getInformationObjects().size());
+        assertEquals(0x1234, asdu.getInformationObjects().get(0).getAddress());
+        assertNull(asdu.getInformationObjects().get(0).getValue());
     }
 
     private byte[] truncatedSecondSinglePointObject() {

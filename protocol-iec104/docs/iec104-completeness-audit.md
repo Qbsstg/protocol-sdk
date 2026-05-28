@@ -95,8 +95,13 @@ The default decoder preserves permissive behavior for truncated recognized
 ASDUs, while the strict constructor can reject truncated information elements
 with `ParseResult.error()`.
 
-`0.7.0` should make this behavior visible in README/API docs and extend the
-fixtures where needed so strict mode remains predictable.
+Direct fixtures now cover truncated ASDU headers, truncated information object
+addresses, truncated information elements, truncated sequential elements,
+strict-mode frame consumption, and raw-only catalog payloads that must remain
+permissive.
+
+`0.7.0` should make this behavior visible in README/API docs so callers can
+choose default permissive parsing or strict diagnostics deliberately.
 
 ### G4. Broaden quality and time-tag edge-case coverage
 
@@ -134,14 +139,14 @@ Public documentation should cover:
   raw-only catalog entry.
 - Direct fixtures now cover representative VSQ/SQ typed and raw-only boundary
   behavior.
-- Strict malformed ASDU mode exists for truncated information elements while
-  the default decoder remains permissive.
+- Strict malformed ASDU fixtures cover truncated headers, object addresses,
+  elements, sequential elements, recovery after consumed malformed frames, and
+  raw-only payloads that remain permissive.
 
 ## Recommended `0.7.0` Order
 
-1. Expand strict malformed-ASDU fixtures where diagnostics are still thin.
-2. Add quality descriptor and `CP56Time2a` edge-case fixtures.
-3. Update README and API docs with the final behavior decisions.
+1. Add quality descriptor and `CP56Time2a` edge-case fixtures.
+2. Update README and API docs with the final behavior decisions.
 
 ## Verification
 
