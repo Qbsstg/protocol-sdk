@@ -109,11 +109,11 @@ Modbus gates:
 
 ## Remaining `0.7.0` Work Order
 
-1. Prepare `0.7.0` readiness and release-note docs.
-2. Prepare and execute the `0.7.0` Maven Central release.
+1. Prepare and execute the `0.7.0` Maven Central release.
 
 The IEC104 hardening work through final README/API support-posture
-documentation is complete for the current `0.7.0` line.
+documentation, release-readiness documentation, and release-note drafting is
+complete for the current `0.7.0` line.
 
 ## Maven Central Publishing Decision
 

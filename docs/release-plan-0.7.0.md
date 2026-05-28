@@ -85,14 +85,13 @@ this line, the first PR should be a design note that answers:
 
 ## Remaining Work Order
 
-1. Prepare `docs/release-readiness-0.7.0.md` and
-   `docs/release-notes-0.7.0.md`.
-2. Run full release verification before tagging.
+1. Run full release verification before tagging.
 
 Completed hardening work includes audit refresh, raw-only catalog fixtures,
 strict/permissive malformed-ASDU coverage, VSQ/SQ boundary fixtures, quality
 descriptor fixtures, `CP56Time2a` edge-case fixtures, and final IEC104
-README/API support-posture documentation.
+README/API support-posture documentation. Release-readiness and release-note
+drafts now exist for the `0.7.0` release candidate.
 
 ## Verification Gates
 
