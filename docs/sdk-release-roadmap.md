@@ -107,19 +107,13 @@ Modbus gates:
 - Unknown and vendor-specific function codes preserve raw bytes when the ADU
   and PDU envelope is valid.
 
-## Recommended `0.7.0` Work Order
+## Remaining `0.7.0` Work Order
 
-1. Refresh the IEC104 completeness audit and roadmap wording for the post-`0.6.0`
-   codebase.
-2. Add IEC104 raw-only fixture coverage for `M_EI_NA_1` and file-transfer Type
-   IDs.
-3. Expand strict/permissive malformed ASDU tests and API documentation.
-4. Add VSQ/SQ boundary fixtures for representative typed and raw-only types.
-5. Add quality descriptor and `CP56Time2a` edge-case fixtures where coverage is
-   currently indirect.
-6. Update IEC104 README/API docs with the final `0.7.0` support posture.
-7. Prepare `0.7.0` readiness and release-note docs.
-8. Prepare and execute the `0.7.0` Maven Central release.
+1. Prepare `0.7.0` readiness and release-note docs.
+2. Prepare and execute the `0.7.0` Maven Central release.
+
+The IEC104 hardening work through final README/API support-posture
+documentation is complete for the current `0.7.0` line.
 
 ## Maven Central Publishing Decision
 

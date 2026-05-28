@@ -120,8 +120,8 @@ device registries, and ingestion adapters belong outside this SDK.
 
 ## IEC104 Coverage
 
-`protocol-iec104` currently recognizes 45 ASDU types and returns typed values
-for every recognized type. Unknown type IDs are preserved as raw bytes for
+`protocol-iec104` currently recognizes 53 ASDU types: 45 typed Type IDs and 8
+recognized raw-only Type IDs. Unknown Type IDs are preserved as raw bytes for
 diagnostics and vendor-specific handling.
 
 Typed coverage includes:
@@ -137,6 +137,8 @@ Typed coverage includes:
 
 The detailed matrix is maintained in
 [`protocol-iec104/docs/asdu-support-matrix.md`](protocol-iec104/docs/asdu-support-matrix.md).
+`M_EI_NA_1` and file-transfer Type IDs `120` through `126` are intentionally
+raw-only until real device traces justify stable typed public models.
 
 ## API Shape
 
@@ -152,14 +154,22 @@ Raw bytes remain available on frames, ASDUs, and information objects. This is
 intentional because protocol integrations often need raw bytes for diagnostics
 and for vendor-specific edge cases.
 
-`Iec104StreamDecoder` is stateful because it buffers incomplete APDUs. Use one
-decoder per TCP stream/session, and call `reset()` only when buffered bytes
-should be discarded, such as after a reconnect.
+`Iec104StreamDecoder` is stateful because it buffers incomplete APDUs. It is a
+parser object, not a session manager. Use one decoder per TCP stream/session,
+do not share it across concurrent sessions, and call `reset()` only when
+buffered bytes should be discarded, such as after a reconnect.
 
 `Iec104StreamDecoder` is permissive by default: malformed recognized ASDUs may
-return the information objects that can still be parsed. Use
+return the information objects that can still be parsed. Construct it with
 `new Iec104StreamDecoder(true)` to enable strict ASDU parsing, where truncated
-recognized information objects are returned as `ParseResult.error()` entries.
+recognized typed ASDUs are returned as `ParseResult.error()` entries. Strict
+mode does not reject recognized raw-only catalog entries or unknown Type IDs;
+those continue to expose raw bytes for diagnostics.
+
+The SDK stops at parsing. IEC104 STARTDT/STOPDT lifecycle decisions, TESTFR
+heartbeat policy, reconnects, command routing, select-before-operate workflow,
+device registry, storage, batching, and backpressure belong in a runtime layer
+that consumes this parser.
 
 ## Compatibility
 
