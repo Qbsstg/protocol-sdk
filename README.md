@@ -111,7 +111,7 @@ and the
 | `protocol-iec101` | Published | IEC 60870-5-101 FT1.2 frame parser and practical ASDU completion target. [Support matrix](protocol-iec101/docs/asdu-support-matrix.md). |
 | `protocol-iec103` | Published | IEC 60870-5-103 FT1.2 frame parser with protection event, measurand, identification, and raw fallback completion target. [Support matrix](protocol-iec103/docs/asdu-support-matrix.md), [Design note](docs/iec103-module-design.md), [Usage](protocol-iec103/docs/api-usage.md). |
 | `protocol-modbus` | `0.6.0` stable | Modbus TCP/UDP ADU, PDU, typed value, and exception parser. [Support matrix](protocol-modbus/docs/function-support-matrix.md), [Usage](protocol-modbus/docs/api-usage.md), [Design note](docs/protocol-modbus-design.md). |
-| `protocol-http` | Planned | HTTP protocol helpers for collection scenarios. |
+| `protocol-http` | Planned | Design pending; HTTP ingestion and server/client concerns remain runtime work unless a small Java 8 SDK helper surface is justified. |
 
 `0.6.0` promotes `protocol-modbus` to a stable parser module for practical
 Modbus TCP and common Modbus-over-UDP MBAP ADU/PDU parsing. The scope remains
@@ -207,7 +207,9 @@ and the ingestion adapter roadmap is documented in
 
 ## Roadmap
 
-- Complete an IEC104 conformance and gap audit before adding more IEC104 types.
+- Execute the `0.7.0` IEC104 hardening plan before adding a new
+  runtime-oriented protocol surface. The plan is tracked in
+  [`docs/release-plan-0.7.0.md`](docs/release-plan-0.7.0.md).
 - The `0.6.0` readiness decision is tracked in
   [`docs/release-readiness-0.6.0.md`](docs/release-readiness-0.6.0.md), with
   release notes in [`docs/release-notes-0.6.0.md`](docs/release-notes-0.6.0.md).

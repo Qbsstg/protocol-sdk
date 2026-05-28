@@ -1,7 +1,7 @@
 # IEC104 Completeness Audit
 
 This audit records the current `protocol-iec104` completeness state after the
-`0.1.0` Maven Central release. It is intentionally scoped to the SDK's current
+published `0.6.0` SDK release. It is intentionally scoped to the SDK's current
 code, tests, and documentation. It does not claim full IEC 60870-5-104
 conformance; formal conformance should still be checked against the licensed
 standard text and real device traces.
@@ -10,14 +10,14 @@ standard text and real device traces.
 
 | Area | Current state | Risk |
 | --- | --- | --- |
-| APDU framing | I-format, S-format, and U-format are decoded. STARTDT, STOPDT, and TESTFR U-format values are mapped. | Unknown U-format control values are represented as `UNKNOWN_U_FORMAT`; no state machine behavior is implemented. |
-| Stream handling | The decoder buffers incomplete APDUs, skips noise before `0x68`, and can decode concatenated APDUs. | Malformed recognized ASDUs with truncated information objects are currently handled permissively by returning the objects that can be parsed. |
-| ASDU catalog | 45 Type IDs are recognized by `Iec104AsduType`; all recognized types are classified as typed values by `Iec104AsduSupport`. | Type IDs outside the current enum are preserved as raw bytes, but some standard catalog types are not modeled yet. |
-| Information objects | Three-octet IEC104 information object addresses are decoded for single and sequence layouts. | There are no explicit tests for invalid SQ usage by type; the decoder is intentionally permissive. |
-| Cause of transmission | Codes 1-13 and 20-36 are modeled, with test and negative-confirm bits exposed separately. | Counter-interrogation return causes 37-41 and unknown-* causes 44-47 are not enum constants yet. Raw cause code is preserved. |
-| Quality descriptors | Status/measurement quality flags and protection quality flags are modeled. | More fixture coverage is needed to prove every quality flag across every value family. |
-| Time tags | `CP56Time2a` exposes raw bytes, invalid flag, summer time flag, date parts, and `LocalDateTime` when valid. | More direct tests are needed for time-tagged measured and double-point variants. |
-| Raw bytes | Raw APDU, ASDU, and information-element bytes are preserved. | This is useful for diagnostics, but unsupported known catalog entries should be made explicit in docs. |
+| APDU framing | I-format, S-format, and U-format are decoded. STARTDT, STOPDT, and TESTFR U-format values are mapped. | Unknown U-format control values are represented as `UNKNOWN_U_FORMAT`; no session state machine behavior is implemented. |
+| Stream handling | The decoder buffers incomplete APDUs, skips noise before `0x68`, and can decode concatenated APDUs. | Session lifecycle, reconnect, heartbeat policy, and flow control remain runtime concerns. |
+| ASDU catalog | 45 Type IDs are typed values and 8 recognized Type IDs are raw-only catalog entries. The support matrix is executable through `Iec104AsduSupportMatrixTest`. | Raw-only initialization and file-transfer entries need broader direct fixture coverage. |
+| Information objects | Three-octet IEC104 information object addresses are decoded for single and sequence layouts. | More explicit VSQ/SQ boundary fixtures are needed for invalid or unusual layouts. |
+| Cause of transmission | Codes 1-13, 20-41, and 44-47 are modeled, with test and negative-confirm bits exposed separately. | Raw cause code preservation should remain part of diagnostic regression coverage. |
+| Quality descriptors | Status/measurement quality flags and protection quality flags are modeled. | More fixture coverage is useful to prove every quality flag across every value family. |
+| Time tags | `CP56Time2a` exposes raw bytes, invalid flag, summer time flag, date parts, and `LocalDateTime` when valid. | Additional edge-case fixtures should cover invalid dates and boundary values across value families. |
+| Raw bytes | Raw APDU, ASDU, and information-element bytes are preserved for typed, raw-only, and unknown cases. | Raw-only catalog coverage should stay explicit so unsupported entries do not look silently complete. |
 
 ## Current Typed ASDU Coverage
 
@@ -25,7 +25,8 @@ The current support matrix is executable and documented:
 
 - `Iec104AsduSupportMatrixTest` requires every known `Iec104AsduType` to be
   categorized.
-- `protocol-iec104/docs/asdu-support-matrix.md` lists all 45 typed Type IDs.
+- `protocol-iec104/docs/asdu-support-matrix.md` lists all 45 typed Type IDs
+  and 8 recognized raw-only Type IDs.
 - Unknown Type IDs are decoded as `Iec104AsduType.UNKNOWN`; raw ASDU and
   information-element bytes remain available.
 
@@ -59,94 +60,91 @@ The test suite has good coverage for parser mechanics and most value families:
 
 ## Gaps and Follow-up Work
 
-### G1. Add explicit tests for shared time-tagged variants
+### G1. Expand direct fixtures for raw-only catalog entries
 
-Some Type IDs are decoded through shared parser methods and are present in the
-support matrix, but do not yet have direct frame-level tests. This is not a
-known implementation bug, but it weakens regression confidence.
+`Iec104AsduSupport` and the support matrix classify `M_EI_NA_1` and
+file-transfer Type IDs `120` through `126` as recognized raw-only entries.
+There is direct parser coverage for representative raw-only behavior, but not
+for every raw-only catalog entry.
 
-Priority direct tests:
+Recommended `0.7.0` handling:
 
-- `M_DP_TB_1`
-- `M_ME_TD_1`
-- `M_ME_TE_1`
-- `M_ME_TF_1`
+- Add direct frame-level fixtures for `M_EI_NA_1`.
+- Add representative fixtures across file-transfer Type IDs `120` through
+  `126`.
+- Keep these entries raw-only unless real device traces justify typed public
+  models.
 
-Track under issue #10, which already covers reusable fixtures and regression
-tests.
+### G2. Expand VSQ/SQ boundary fixtures
 
-### G2. Expand cause-of-transmission enum coverage
+The decoder supports single and sequence information-object layouts and is
+intentionally permissive in several edge cases. `0.7.0` should add fixtures
+that either lock down the current behavior or document why stricter validation
+belongs outside the current SDK parser.
 
-`Iec104Asdu` preserves the raw cause code, but
-`Iec104CauseOfTransmission.fromCode()` currently maps only codes 1-13 and
-20-36 to named enum values.
+Priority examples:
 
-Add enum constants and tests for:
+- Sequential typed process values.
+- Sequential raw-only Type IDs.
+- Mismatched object count versus available element bytes in strict mode.
+- Type families where sequence addressing is uncommon or not useful.
 
-- Counter interrogation return causes: 37-41.
-- Unknown type/cause/common-address/information-object-address causes: 44-47.
+### G3. Keep malformed-ASDU strictness documented
 
-This is a field-level completeness gap and should be addressed before calling
-the IEC104 SDK "complete" for common integration diagnostics.
+The default decoder preserves permissive behavior for truncated recognized
+ASDUs, while the strict constructor can reject truncated information elements
+with `ParseResult.error()`.
 
-### G3. Decide scope for initialization and file-transfer Type IDs
+`0.7.0` should make this behavior visible in README/API docs and extend the
+fixtures where needed so strict mode remains predictable.
 
-The practical 0.1.0 parser does not model the IEC initialization/file-transfer
-catalog entries, such as:
+### G4. Broaden quality and time-tag edge-case coverage
 
-- `M_EI_NA_1` end of initialization, Type ID 70.
-- File transfer Type IDs commonly listed in the 120-126 range.
+Status, measurement, and protection quality descriptors expose their raw bytes
+and named flags. `CP56Time2a` exposes raw bytes, invalid flag, summer time flag,
+date parts, and `LocalDateTime` when the value is valid.
 
-Recommended handling for v0.2.0:
+More direct fixtures should cover:
 
-- Add them as explicit raw-only entries first if typed semantics are not needed.
-- Promote to typed values only when real device traces or integration demand
-  justify the model design.
-- Keep unknown Type ID raw-byte preservation as the fallback for vendor-specific
-  extensions.
-
-### G4. Decide strictness for malformed recognized ASDUs
-
-For recognized ASDU types, the decoder currently stops parsing information
-objects when there are not enough bytes for the next object. It does not emit a
-`ParseResult.error()` for that malformed ASDU.
-
-This is acceptable for a permissive stream decoder, but users may need stricter
-diagnostics. v0.2.0 should decide between:
-
-- Preserve current permissive behavior and document it.
-- Add a strict mode that returns errors for truncated information objects.
-- Add metadata that records expected vs actual object count without breaking
-  current behavior.
+- Every quality flag for representative process, measured, and protection
+  value families.
+- Invalid `CP56Time2a` dates and boundary values.
+- Raw-byte preservation for time-tagged values when the parsed date is invalid.
 
 ### G5. Document API expectations more explicitly
 
-Issue #11 should cover public documentation for:
+Public documentation should cover:
 
 - Thread-safety: `Iec104StreamDecoder` is stateful because it buffers partial
   input; callers should use one decoder per stream/session.
+- Strict versus permissive malformed ASDU behavior.
 - Raw-byte fallback behavior.
 - `Iec104AsduSupport` usage.
-- Difference between stable Maven Central version `0.1.0` and `main`
-  development version.
+- Difference between parser SDK behavior and runtime session behavior.
 
-## Recommended v0.2.0 Order
+## Completed Since The Original Audit
 
-1. Add direct frame-level tests for `M_DP_TB_1` and `M_ME_TD_1` /
-   `M_ME_TE_1` / `M_ME_TF_1`.
-2. Expand `Iec104CauseOfTransmission` with codes 37-41 and 44-47 plus tests.
-3. Decide whether Type IDs 70 and 120-126 should be raw-only or typed in
-   `Iec104AsduSupport`.
-4. Decide strict vs permissive malformed ASDU behavior.
-5. Update README and module docs after the behavior decisions are implemented.
+- Direct tests now cover time-tagged double-point and measured variants:
+  `M_DP_TB_1`, `M_ME_TD_1`, `M_ME_TE_1`, and `M_ME_TF_1`.
+- `Iec104CauseOfTransmission` now names counter-interrogation return causes
+  `37` through `41` and diagnostic unknown causes `44` through `47`.
+- `M_EI_NA_1` and file-transfer Type IDs `120` through `126` are recognized
+  raw-only support-matrix entries.
+- Strict malformed ASDU mode exists for truncated information elements while
+  the default decoder remains permissive.
+
+## Recommended `0.7.0` Order
+
+1. Add raw-only fixtures for `M_EI_NA_1` and file-transfer Type IDs.
+2. Add VSQ/SQ boundary fixtures for typed and raw-only families.
+3. Expand strict malformed-ASDU fixtures where diagnostics are still thin.
+4. Add quality descriptor and `CP56Time2a` edge-case fixtures.
+5. Update README and API docs with the final behavior decisions.
 
 ## Verification
 
 Current verification command:
 
 ```bash
-mvn -q verify
+mvn -q -pl protocol-iec104 -am test
 ```
-
-At the time of this audit, the project passes the full Maven verification suite
-with 58 tests.

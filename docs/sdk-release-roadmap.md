@@ -9,6 +9,8 @@ The working product decision is:
   Modbus as an experimental module.
 - `0.6.0` promoted Modbus TCP/UDP parsing from experimental to a stable SDK
   module for the documented parser-only scope.
+- `0.7.0` should harden the IEC104 parser and documentation before starting a
+  new HTTP/runtime-oriented SDK surface.
 - The future JDK 21 collector runtime remains separate from SDK releases.
 
 ## Version Intent
@@ -21,24 +23,56 @@ The working product decision is:
 | `0.4.0` | IEC103 hardening release. | Add protection relay fixtures, support matrix, relay event coverage, and clearer raw-only boundaries. |
 | `0.5.0` | IEC101 and IEC103 completion target. | Practical open-source SDK release for IEC101, IEC103, and existing IEC104 use cases. |
 | `0.6.0` | Modbus stable completion. | Promote `protocol-modbus` from experimental to a stable TCP/UDP parser module for the documented parser-only scope. |
+| `0.7.0` | IEC104 hardening. | Refresh the stale IEC104 audit, expand direct fixtures, document strict/permissive behavior, and keep runtime concerns out of the SDK. |
 
 The `0.6.0` plan is tracked in
 [`release-plan-0.6.0.md`](release-plan-0.6.0.md).
 
+The `0.7.0` plan is tracked in
+[`release-plan-0.7.0.md`](release-plan-0.7.0.md).
+
 `0.6.0` should not mean every Modbus ecosystem corner case is complete. It
 means the SDK has a defensible, documented, tested, and stable-enough parser
 surface for common Modbus TCP and Modbus-over-UDP scenarios.
+
+`0.7.0` should not mean formal IEC104 certification. It should mean the IEC104
+SDK has a current audit, fixture-backed diagnostics, and clear public
+documentation for practical integration use.
 
 ## Module Status Target
 
 | Module | Current status | Next target |
 | --- | --- | --- |
 | `protocol-core` | Shared parser contracts. | Stable Java 8 API; no runtime dependencies. |
-| `protocol-iec104` | Published typed parser. | Maintain compatibility; only add fixes and documented gap closures. |
+| `protocol-iec104` | Published typed parser with recognized raw-only catalog entries. | `0.7.0` hardening: current audit, raw-only fixtures, strict/permissive diagnostics, and documentation cleanup. |
 | `protocol-iec101` | Published `0.5.0` completion target. | Compatibility maintenance and bug fixes. |
 | `protocol-iec103` | Published `0.5.0` completion target. | Compatibility maintenance and bug fixes. |
 | `protocol-modbus` | Published `0.6.0` stable TCP/UDP parser surface. | Compatibility maintenance and targeted function-code expansion. |
-| `protocol-http` | Planned. | Keep planned unless a future SDK phase needs HTTP helper APIs. |
+| `protocol-http` | Planned. | Keep planned until a design proves what belongs in the Java 8 SDK rather than the JDK 21 runtime. |
+
+## `0.7.0` Release Gates
+
+The `0.7.0` release should not be tagged until these conditions are true.
+
+General SDK gates:
+
+- `mvn -q verify` passes locally and in CI on JDK 8 and JDK 21.
+- Public APIs remain Java 8 compatible.
+- No SDK module depends on Spring, Netty, databases, Redis, MQTT, Kafka, HTTP
+  server/client frameworks, or runtime globals.
+- Maven Central metadata, source jars, Javadoc jars, signatures, and checksums
+  remain valid.
+
+IEC104 gates:
+
+- The IEC104 completeness audit reflects the current post-`0.6.0` codebase.
+- Recognized raw-only initialization and file-transfer Type IDs have direct
+  fixture coverage for raw-byte preservation.
+- Strict and permissive malformed ASDU behavior is documented and tested.
+- VSQ/SQ boundary behavior is covered by tests or explicitly documented as
+  permissive.
+- API docs explain decoder statefulness, raw fallback, support matrix usage,
+  and diagnostic cause handling.
 
 ## `0.6.0` Release Gates
 
@@ -73,18 +107,19 @@ Modbus gates:
 - Unknown and vendor-specific function codes preserve raw bytes when the ADU
   and PDU envelope is valid.
 
-## Recommended Work Order
+## Recommended `0.7.0` Work Order
 
-1. Add the Modbus support matrix for current typed, raw-only, unknown, and
-   deferred behavior.
-2. Add Modbus API usage docs.
-3. Promote or explicitly defer typed `0x17` support.
-4. Expand malformed MBAP/PDU fixture coverage for TCP and UDP decoders.
-5. Add standard quantity-limit and byte-count validation tests.
-6. Audit public Modbus model immutability and Java 8 compatibility.
-7. Prepare `0.6.0` readiness and release-note docs.
-8. Update README status only when Modbus stability gates are complete.
-9. Prepare and execute the `0.6.0` Maven Central release.
+1. Refresh the IEC104 completeness audit and roadmap wording for the post-`0.6.0`
+   codebase.
+2. Add IEC104 raw-only fixture coverage for `M_EI_NA_1` and file-transfer Type
+   IDs.
+3. Expand strict/permissive malformed ASDU tests and API documentation.
+4. Add VSQ/SQ boundary fixtures for representative typed and raw-only types.
+5. Add quality descriptor and `CP56Time2a` edge-case fixtures where coverage is
+   currently indirect.
+6. Update IEC104 README/API docs with the final `0.7.0` support posture.
+7. Prepare `0.7.0` readiness and release-note docs.
+8. Prepare and execute the `0.7.0` Maven Central release.
 
 ## Maven Central Publishing Decision
 
