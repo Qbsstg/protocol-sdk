@@ -109,12 +109,14 @@ Status, measurement, and protection quality descriptors expose their raw bytes
 and named flags. `CP56Time2a` exposes raw bytes, invalid flag, summer time flag,
 date parts, and `LocalDateTime` when the value is valid.
 
-More direct fixtures should cover:
+Direct fixtures now cover:
 
 - Every quality flag for representative process, measured, and protection
   value families.
-- Invalid `CP56Time2a` dates and boundary values.
-- Raw-byte preservation for time-tagged values when the parsed date is invalid.
+- Valid `CP56Time2a` boundary values, including 59.999 seconds, summer-time
+  flag, day-of-week bits, and year `2099`.
+- Invalid `CP56Time2a` date parts and raw-byte preservation when
+  `LocalDateTime` cannot be created.
 
 ### G5. Document API expectations more explicitly
 
@@ -142,11 +144,12 @@ Public documentation should cover:
 - Strict malformed ASDU fixtures cover truncated headers, object addresses,
   elements, sequential elements, recovery after consumed malformed frames, and
   raw-only payloads that remain permissive.
+- Direct fixtures now cover representative quality descriptor flags and
+  `CP56Time2a` edge cases.
 
 ## Recommended `0.7.0` Order
 
-1. Add quality descriptor and `CP56Time2a` edge-case fixtures.
-2. Update README and API docs with the final behavior decisions.
+1. Update README and API docs with the final behavior decisions.
 
 ## Verification
 
