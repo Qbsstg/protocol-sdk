@@ -33,6 +33,11 @@ Do not share one decoder across unrelated devices, TCP sessions, or concurrent
 threads. Create a new decoder for each session, or call `reset()` when a session
 is replaced and any buffered partial bytes should be discarded.
 
+The decoder owns only parser buffering. TCP connection lifecycle, STARTDT and
+STOPDT policy, TESTFR heartbeat policy, reconnects, command orchestration,
+storage, batching, and backpressure belong to the caller or to a separate
+runtime layer.
+
 ## Handling Parse Results
 
 `decode(byte[])` returns zero or more `ParseResult<Iec104Frame>` entries. An
@@ -52,6 +57,36 @@ for (ParseResult<Iec104Frame> result : results) {
 
 The decoder can recover from noise and invalid APDU lengths by returning an
 error result and consuming the invalid bytes reported by `getConsumedBytes()`.
+
+## Strict ASDU Diagnostics
+
+The default constructor keeps ASDU parsing permissive:
+
+```java
+Iec104StreamDecoder decoder = new Iec104StreamDecoder();
+```
+
+In permissive mode, a malformed recognized ASDU can still return a successful
+frame with the information objects that were complete enough to parse. This is
+useful when integrations prefer best-effort diagnostics and raw-byte retention.
+
+Use strict ASDU parsing when truncated recognized typed ASDUs should be reported
+as errors:
+
+```java
+Iec104StreamDecoder decoder = new Iec104StreamDecoder(true);
+for (ParseResult<Iec104Frame> result : decoder.decode(tcpPayload)) {
+    if (result.isError()) {
+        int consumedBytes = result.getConsumedBytes();
+        String message = result.getMessage();
+    }
+}
+```
+
+Strict mode validates recognized typed ASDU headers, information object
+addresses, and information element lengths before constructing the frame. It
+does not reject recognized raw-only catalog entries or unknown Type IDs; those
+continue to expose raw bytes for diagnostics.
 
 ## Inspecting Frames and ASDUs
 
@@ -109,6 +144,14 @@ if (support.hasTypedValue()) {
 The human-readable support matrix is maintained in
 [`asdu-support-matrix.md`](asdu-support-matrix.md).
 
+The support statuses mean:
+
+| Status | Decoder behavior |
+| --- | --- |
+| Typed value | `Iec104InformationObject.getValue()` returns a public model class such as `Iec104MeasuredValue`. |
+| Raw bytes only | The Type ID is recognized, but no stable typed model is promised yet. Use raw ASDU or information-object bytes. |
+| Unknown type | The Type ID is not listed in `Iec104AsduType`; raw bytes are still preserved. |
+
 ## Raw-Byte Fallback
 
 Raw bytes remain available at every level:
@@ -122,6 +165,24 @@ Raw bytes remain available at every level:
 For unknown Type IDs, `Iec104Asdu.getType()` returns `Iec104AsduType.UNKNOWN`,
 `Iec104InformationObject.getValue()` returns `null`, and raw bytes are still
 preserved for diagnostics or vendor-specific handling.
+
+Recognized raw-only Type IDs behave similarly at the value level:
+`Iec104InformationObject.getValue()` returns `null`, while the ASDU type remains
+known and `Iec104AsduSupport.isRawBytesOnly()` returns `true`.
+
+## Quality And Time Tags
+
+Status and measured values expose `Iec104QualityDescriptor`; protection events
+expose `Iec104ProtectionQualityDescriptor`. These descriptors retain the raw
+quality byte and expose named flags such as invalid, not topical, substituted,
+blocked, overflow, or elapsed-time invalid where that flag exists for the value
+family.
+
+`Iec104Cp56Time2a` retains the original seven bytes and exposes invalid,
+summer-time, date, and time fields. `getDateTime()` returns a `LocalDateTime`
+only when the encoded date can be represented by `java.time`; otherwise it
+returns `null` and callers can still inspect `getRawBytes()` plus the decoded
+parts.
 
 ## Java Compatibility
 

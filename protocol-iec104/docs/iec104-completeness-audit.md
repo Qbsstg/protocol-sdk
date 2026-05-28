@@ -15,8 +15,8 @@ standard text and real device traces.
 | ASDU catalog | 45 Type IDs are typed values and 8 recognized Type IDs are raw-only catalog entries. The support matrix is executable through `Iec104AsduSupportMatrixTest`, and raw-only catalog entries have direct parser fixtures. | Raw-only initialization and file-transfer entries should stay raw-only until real traces justify typed models. |
 | Information objects | Three-octet IEC104 information object addresses are decoded for single and sequence layouts. Representative VSQ/SQ boundary fixtures cover typed sequence, typed non-sequence, and raw-only sequence behavior. | Additional fixtures may still be useful for rare type-family-specific SQ constraints. |
 | Cause of transmission | Codes 1-13, 20-41, and 44-47 are modeled, with test and negative-confirm bits exposed separately. | Raw cause code preservation should remain part of diagnostic regression coverage. |
-| Quality descriptors | Status/measurement quality flags and protection quality flags are modeled. | More fixture coverage is useful to prove every quality flag across every value family. |
-| Time tags | `CP56Time2a` exposes raw bytes, invalid flag, summer time flag, date parts, and `LocalDateTime` when valid. | Additional edge-case fixtures should cover invalid dates and boundary values across value families. |
+| Quality descriptors | Status/measurement quality flags and protection quality flags are modeled, documented, and covered by representative edge-case fixtures. | Coverage is practical regression coverage, not formal conformance certification. |
+| Time tags | `CP56Time2a` exposes raw bytes, invalid flag, summer time flag, date parts, and `LocalDateTime` when valid; invalid date raw bytes remain available. | Coverage is practical regression coverage, not formal conformance certification. |
 | Raw bytes | Raw APDU, ASDU, and information-element bytes are preserved for typed, raw-only, and unknown cases. | Raw-only catalog coverage should stay explicit so unsupported entries do not look silently complete. |
 
 ## Current Typed ASDU Coverage
@@ -100,8 +100,8 @@ addresses, truncated information elements, truncated sequential elements,
 strict-mode frame consumption, and raw-only catalog payloads that must remain
 permissive.
 
-`0.7.0` should make this behavior visible in README/API docs so callers can
-choose default permissive parsing or strict diagnostics deliberately.
+README and API docs now make this behavior visible so callers can choose
+default permissive parsing or strict diagnostics deliberately.
 
 ### G4. Broaden quality and time-tag edge-case coverage
 
@@ -120,7 +120,7 @@ Direct fixtures now cover:
 
 ### G5. Document API expectations more explicitly
 
-Public documentation should cover:
+Public documentation now covers:
 
 - Thread-safety: `Iec104StreamDecoder` is stateful because it buffers partial
   input; callers should use one decoder per stream/session.
@@ -146,10 +146,14 @@ Public documentation should cover:
   raw-only payloads that remain permissive.
 - Direct fixtures now cover representative quality descriptor flags and
   `CP56Time2a` edge cases.
+- README and API docs now document the final `0.7.0` IEC104 support posture,
+  including decoder lifecycle, strict diagnostics, raw-byte fallback, support
+  lookup, quality/time fields, and SDK/runtime boundaries.
 
 ## Recommended `0.7.0` Order
 
-1. Update README and API docs with the final behavior decisions.
+1. Prepare `0.7.0` readiness and release-note docs.
+2. Run full release verification before tagging.
 
 ## Verification
 

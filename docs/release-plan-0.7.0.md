@@ -83,18 +83,16 @@ this line, the first PR should be a design note that answers:
 - Whether the SDK can support useful HTTP helpers without JSON, servlet,
   Netty, Spring, or HTTP client/server dependencies.
 
-## Recommended Work Order
+## Remaining Work Order
 
-1. Refresh the IEC104 completeness audit and roadmap wording for the post-`0.6.0`
-   codebase.
-2. Add raw-only fixture coverage for `M_EI_NA_1` and file-transfer Type IDs.
-3. Expand strict/permissive malformed ASDU tests and API documentation.
-4. Add VSQ/SQ boundary fixtures for representative typed and raw-only types.
-5. Add quality descriptor and `CP56Time2a` edge-case fixtures where coverage is
-   currently indirect.
-6. Update IEC104 README/API docs with the final `0.7.0` support posture.
-7. Prepare `docs/release-readiness-0.7.0.md` and `docs/release-notes-0.7.0.md`.
-8. Run full release verification before tagging.
+1. Prepare `docs/release-readiness-0.7.0.md` and
+   `docs/release-notes-0.7.0.md`.
+2. Run full release verification before tagging.
+
+Completed hardening work includes audit refresh, raw-only catalog fixtures,
+strict/permissive malformed-ASDU coverage, VSQ/SQ boundary fixtures, quality
+descriptor fixtures, `CP56Time2a` edge-case fixtures, and final IEC104
+README/API support-posture documentation.
 
 ## Verification Gates
 
