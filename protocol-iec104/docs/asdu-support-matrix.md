@@ -98,14 +98,15 @@ only until typed models are justified by real integration demand.
 
 The remaining IEC104 gaps are behavior and documentation decisions rather than
 missing support-matrix categories. The current matrix covers the practical typed
-set and classifies recognized initialization/file-transfer catalog entries as
-raw-only.
+set, classifies recognized initialization/file-transfer catalog entries as
+raw-only, and has direct fixtures for raw-byte preservation across those
+raw-only entries.
 
 - Promote raw-only initialization or file-transfer entries to typed values only
   after real device traces or integration demand justify the public model.
 
 See [`iec104-completeness-audit.md`](iec104-completeness-audit.md) for the
-field-level audit and recommended v0.2.0 order.
+field-level audit and recommended `0.7.0` order.
 
 ## Maintenance Rule
 

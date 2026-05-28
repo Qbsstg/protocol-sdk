@@ -12,7 +12,7 @@ standard text and real device traces.
 | --- | --- | --- |
 | APDU framing | I-format, S-format, and U-format are decoded. STARTDT, STOPDT, and TESTFR U-format values are mapped. | Unknown U-format control values are represented as `UNKNOWN_U_FORMAT`; no session state machine behavior is implemented. |
 | Stream handling | The decoder buffers incomplete APDUs, skips noise before `0x68`, and can decode concatenated APDUs. | Session lifecycle, reconnect, heartbeat policy, and flow control remain runtime concerns. |
-| ASDU catalog | 45 Type IDs are typed values and 8 recognized Type IDs are raw-only catalog entries. The support matrix is executable through `Iec104AsduSupportMatrixTest`. | Raw-only initialization and file-transfer entries need broader direct fixture coverage. |
+| ASDU catalog | 45 Type IDs are typed values and 8 recognized Type IDs are raw-only catalog entries. The support matrix is executable through `Iec104AsduSupportMatrixTest`, and raw-only catalog entries have direct parser fixtures. | Raw-only initialization and file-transfer entries should stay raw-only until real traces justify typed models. |
 | Information objects | Three-octet IEC104 information object addresses are decoded for single and sequence layouts. | More explicit VSQ/SQ boundary fixtures are needed for invalid or unusual layouts. |
 | Cause of transmission | Codes 1-13, 20-41, and 44-47 are modeled, with test and negative-confirm bits exposed separately. | Raw cause code preservation should remain part of diagnostic regression coverage. |
 | Quality descriptors | Status/measurement quality flags and protection quality flags are modeled. | More fixture coverage is useful to prove every quality flag across every value family. |
@@ -57,23 +57,23 @@ The test suite has good coverage for parser mechanics and most value families:
 | Time-tagged commands | Single, double, regulating step, set point, bitstring. |
 | Parameters | Normalized/scaled/short-float measured parameters, parameter activation, sequential parameters. |
 | Boundary behavior | Negative numeric values, double-point state mapping, invalid CP56Time2a, unknown ASDU raw-byte preservation, packed bit index bounds. |
+| Raw-only catalog | `M_EI_NA_1` and file-transfer Type IDs `120` through `126` preserve raw information bytes without typed values. |
 
 ## Gaps and Follow-up Work
 
-### G1. Expand direct fixtures for raw-only catalog entries
+### G1. Decide typed scope for raw-only catalog entries
 
 `Iec104AsduSupport` and the support matrix classify `M_EI_NA_1` and
 file-transfer Type IDs `120` through `126` as recognized raw-only entries.
-There is direct parser coverage for representative raw-only behavior, but not
-for every raw-only catalog entry.
+Direct parser fixtures now cover raw-byte preservation for every raw-only
+catalog entry.
 
 Recommended `0.7.0` handling:
 
-- Add direct frame-level fixtures for `M_EI_NA_1`.
-- Add representative fixtures across file-transfer Type IDs `120` through
-  `126`.
 - Keep these entries raw-only unless real device traces justify typed public
   models.
+- Promote a raw-only entry to a typed model only with a focused design note and
+  fixture set for that public model.
 
 ### G2. Expand VSQ/SQ boundary fixtures
 
@@ -130,16 +130,17 @@ Public documentation should cover:
   `37` through `41` and diagnostic unknown causes `44` through `47`.
 - `M_EI_NA_1` and file-transfer Type IDs `120` through `126` are recognized
   raw-only support-matrix entries.
+- Direct fixtures now cover raw-byte preservation for every recognized
+  raw-only catalog entry.
 - Strict malformed ASDU mode exists for truncated information elements while
   the default decoder remains permissive.
 
 ## Recommended `0.7.0` Order
 
-1. Add raw-only fixtures for `M_EI_NA_1` and file-transfer Type IDs.
-2. Add VSQ/SQ boundary fixtures for typed and raw-only families.
-3. Expand strict malformed-ASDU fixtures where diagnostics are still thin.
-4. Add quality descriptor and `CP56Time2a` edge-case fixtures.
-5. Update README and API docs with the final behavior decisions.
+1. Add VSQ/SQ boundary fixtures for typed and raw-only families.
+2. Expand strict malformed-ASDU fixtures where diagnostics are still thin.
+3. Add quality descriptor and `CP56Time2a` edge-case fixtures.
+4. Update README and API docs with the final behavior decisions.
 
 ## Verification
 
